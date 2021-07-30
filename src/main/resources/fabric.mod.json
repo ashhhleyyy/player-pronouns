@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "playerpronouns",
+  "version": "${version}",
+
+  "name": "Player Pronouns",
+  "description": "A server-side mod adding pronouns!",
+
+  "authors": [
+    "Ash (ashisbored)"
+  ],
+  "contact": {
+    "sources": "https://github.com/ashisbored/player-pronouns",
+    "issues": "https://github.com/ashisbored/player-pronouns/issues"
+  },
+
+  "license": "MIT",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "io.github.ashisbored.playerpronouns.PlayerPronouns"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.11.6",
+    "fabric": "*",
+    "minecraft": "1.17.x",
+    "java": ">=16"
+  }
+}

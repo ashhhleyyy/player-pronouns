@@ -1,0 +1,3 @@
+The default pronouns are sorted in the file alphabetically to avoid bias.
+Pairs are pronouns that can be combined in the form a/b, and are ordered with both forms on the same line.
+The list of default pronouns is based on the available pronouns on https://pronoundb.org/

@@ -1,0 +1,15 @@
+{
+  "_comment": "See default_pronouns.txt",
+  "single": [
+    "any",
+    "ask",
+    "avoid",
+    "other"
+  ],
+  "pairs": [
+    "he", "him",
+    "it", "its",
+    "she", "her",
+    "they", "them"
+  ]
+}
