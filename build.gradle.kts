@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 
-version = "1.0.0-beta"
+version = "1.0.0"
 group = "io.github.ashisbored"
 
 repositories {

@@ -38,3 +38,6 @@ To configure pronouns to show up like this, you can set the `chat` style to the 
 ```
 
 ![](https://cdn.discordapp.com/attachments/859419898962116642/870739744286453820/2021-07-30_19.45.49.png)
+
+### Backing up the database
+The mod stores the mapping of players -> pronouns inside the world save file at `world/playerdata/pronouns.dat`. Note that the file is a custom binary format, NOT NBT, and so cannot be edited using normal tools.
