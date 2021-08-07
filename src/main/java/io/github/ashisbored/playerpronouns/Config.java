@@ -5,8 +5,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.github.ashisbored.playerpronouns.data.Pronoun;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
@@ -19,15 +21,15 @@ import java.util.Optional;
 public class Config {
     private static final Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("allow_custom").forGetter(config -> config.allowCustom),
-            Codec.STRING.listOf().fieldOf("single").forGetter(config -> config.single),
-            Codec.STRING.listOf().fieldOf("pairs").forGetter(config -> config.pairs)
+            Pronoun.CODEC.listOf().fieldOf("single").forGetter(config -> config.single),
+            Pronoun.CODEC.listOf().fieldOf("pairs").forGetter(config -> config.pairs)
     ).apply(instance, Config::new));
 
     private final boolean allowCustom;
-    private final List<String> single;
-    private final List<String> pairs;
+    private final List<Pronoun> single;
+    private final List<Pronoun> pairs;
 
-    private Config(boolean allowCustom, List<String> single, List<String> pairs) {
+    private Config(boolean allowCustom, List<Pronoun> single, List<Pronoun> pairs) {
         this.allowCustom = allowCustom;
         this.single = single;
         this.pairs = pairs;
@@ -41,11 +43,11 @@ public class Config {
         return allowCustom;
     }
 
-    public List<String> getSingle() {
+    public List<Pronoun> getSingle() {
         return single;
     }
 
-    public List<String> getPairs() {
+    public List<Pronoun> getPairs() {
         return pairs;
     }
 
@@ -69,7 +71,10 @@ public class Config {
                 String s = Files.readString(path);
                 JsonParser parser = new JsonParser();
                 JsonElement ele = parser.parse(s);
-                return CODEC.decode(JsonOps.INSTANCE, ele).map(Pair::getFirst).result().orElseGet(Config::new);
+                DataResult<Config> result = CODEC.decode(JsonOps.INSTANCE, ele).map(Pair::getFirst);
+                Optional<DataResult.PartialResult<Config>> err = result.error();
+                err.ifPresent(e -> PlayerPronouns.LOGGER.warn("Failed to load config: {}", e.message()));
+                return result.result().orElseGet(Config::new);
             } catch (IOException e) {
                 PlayerPronouns.LOGGER.warn("Failed to load config!", e);
                 return new Config();

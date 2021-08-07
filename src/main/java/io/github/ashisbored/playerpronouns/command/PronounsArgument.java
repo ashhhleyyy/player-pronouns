@@ -15,7 +15,7 @@ public class PronounsArgument {
                 .suggests((ctx, builder) -> {
                     String remaining = builder.getRemainingLowerCase();
 
-                    for (String pronouns : PronounList.get().getCalculatedPronounStrings()) {
+                    for (String pronouns : PronounList.get().getCalculatedPronounStrings().keySet()) {
                         if (pronouns.toLowerCase(Locale.ROOT).startsWith(remaining)) {
                             builder.suggest(pronouns);
                         }

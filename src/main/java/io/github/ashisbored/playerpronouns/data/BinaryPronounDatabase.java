@@ -2,11 +2,14 @@ package io.github.ashisbored.playerpronouns.data;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.UUID;
 
 public class BinaryPronounDatabase {
@@ -46,6 +49,19 @@ public class BinaryPronounDatabase {
                 out.writeUTF(entry.getValue());
             }
         }
+    }
+
+    public static PalettePronounDatabase convert(Path path) throws IOException {
+        Object2ObjectMap<UUID, Pronouns> pronouns = new Object2ObjectOpenHashMap<>();
+        Map<String, Text> pronounStrings = PronounList.get().getCalculatedPronounStrings();
+        for (var entry : BinaryPronounDatabase.load(path).data.entrySet()) {
+            Text formatted = new LiteralText(entry.getValue());
+            if (pronounStrings.containsKey(entry.getValue())) {
+                formatted = pronounStrings.get(entry.getValue());
+            }
+            pronouns.put(entry.getKey(), new Pronouns(entry.getValue(), formatted));
+        }
+        return new PalettePronounDatabase(pronouns);
     }
 
     public static BinaryPronounDatabase load(Path path) throws IOException {

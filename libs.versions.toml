@@ -6,6 +6,7 @@ fabric-loader = "0.11.6"
 fabric-api = "0.37.1+1.17"
 
 placeholder-api = "1.0.1+1.17"
+more-codecs = "0.2.0"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
@@ -15,3 +16,4 @@ fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-l
 fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
 
 placeholder-api = { module = "eu.pb4:placeholder-api", version.ref = "placeholder-api" }
+more-codecs = { module = "xyz.nucleoid:more-codecs", version.ref = "more-codecs" }

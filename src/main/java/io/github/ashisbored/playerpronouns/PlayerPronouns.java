@@ -3,8 +3,9 @@ package io.github.ashisbored.playerpronouns;
 import eu.pb4.placeholders.PlaceholderAPI;
 import eu.pb4.placeholders.PlaceholderResult;
 import io.github.ashisbored.playerpronouns.command.PronounsCommand;
-import io.github.ashisbored.playerpronouns.data.BinaryPronounDatabase;
+import io.github.ashisbored.playerpronouns.data.PronounDatabase;
 import io.github.ashisbored.playerpronouns.data.PronounList;
+import io.github.ashisbored.playerpronouns.data.Pronouns;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -24,7 +25,7 @@ public class PlayerPronouns implements ModInitializer {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MOD_ID = "playerpronouns";
 
-    private static BinaryPronounDatabase pronounDatabase;
+    private static PronounDatabase pronounDatabase;
     public static Config config;
 
     @Override
@@ -40,7 +41,7 @@ public class PlayerPronouns implements ModInitializer {
                 if (!Files.exists(playerData)) {
                     Files.createDirectories(playerData);
                 }
-                pronounDatabase = BinaryPronounDatabase.load(playerData.resolve("pronouns.dat"));
+                pronounDatabase = PronounDatabase.load(playerData.resolve("pronouns.dat"));
             } catch (IOException e) {
                 LOGGER.error("Failed to create/load pronoun database!", e);
             }
@@ -69,8 +70,26 @@ public class PlayerPronouns implements ModInitializer {
             if (pronounDatabase == null) {
                 return PlaceholderResult.value("Unknown");
             }
-            String pronouns = pronounDatabase.get(player.getUuid());
-            return PlaceholderResult.value(Objects.requireNonNullElse(pronouns, "Unknown"));
+            Pronouns pronouns = pronounDatabase.get(player.getUuid());
+            if (pronouns == null) {
+                return PlaceholderResult.value("Unknown");
+            }
+            return PlaceholderResult.value(pronouns.formatted());
+        });
+
+        PlaceholderAPI.register(new Identifier(MOD_ID, "raw_pronouns"), ctx -> {
+            if (!ctx.hasPlayer()) {
+                return PlaceholderResult.invalid("missing player");
+            }
+            ServerPlayerEntity player = ctx.getPlayer();
+            if (pronounDatabase == null) {
+                return PlaceholderResult.value("Unknown");
+            }
+            Pronouns pronouns = pronounDatabase.get(player.getUuid());
+            if (pronouns == null) {
+                return PlaceholderResult.value("Unknown");
+            }
+            return PlaceholderResult.value(pronouns.raw());
         });
     }
 
@@ -82,7 +101,7 @@ public class PlayerPronouns implements ModInitializer {
         pronounDatabase.save(playerData.resolve("pronouns.dat"));
     }
 
-    public static boolean setPronouns(ServerPlayerEntity player, String pronouns) {
+    public static boolean setPronouns(ServerPlayerEntity player, Pronouns pronouns) {
         if (pronounDatabase == null) return false;
 
         pronounDatabase.put(player.getUuid(), pronouns);

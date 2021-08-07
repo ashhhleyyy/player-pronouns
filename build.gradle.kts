@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 
-version = "1.0.0"
+version = "1.1.0"
 group = "io.github.ashisbored"
 
 repositories {
@@ -27,6 +27,10 @@ dependencies {
     // placeholder-api
     modImplementation(libs.placeholder.api)
     include(libs.placeholder.api)
+
+    // more-codecs
+    modImplementation(libs.more.codecs)
+    include(libs.more.codecs)
 }
 
 tasks.processResources {
