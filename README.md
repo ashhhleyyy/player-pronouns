@@ -12,10 +12,19 @@ It will suggest pronouns that are configured by the server admins, along with th
 ### Configuration
 The mod should work out of the box without any configuration, however if you want player's pronouns to be visible, you probably want to use the placeholder somewhere.
 
+#### Reloading the config
+You can reload the config file using the command `/pronouns reload-config`. This requires either OP level 4 or the permission `playerpronouns.reload_config`.
+
 #### Adding custom pronouns (eg. neo-pronouns)
 To add custom pronoun sets, you can use the `single` and `pairs` options in the config file. `single` is for singular options such as `any` or `ask` while `pairs` is for pronouns that come in pairs and are used in the form `a/b`, for example `they` and `them`.
 
+#### Setting the default placeholder
+You can configure the default text returned by the placeholder when a player does not have pronouns set by changing the `default_placeholder` config value. You can also override the default in particular cases by passing an argument to the placeholder like this: `%playerpronouns:pronouns/ask%` (or `%playerpronouns:raw_pronouns/ask%`) where `ask` is the default text.
+
 #### Displaying pronouns
+You can display the pronouns in any [TextPlaceholderAPI](https://github.com/Patbox/TextPlaceholderAPI) compatible mods using the following placeholders:
+* `playerpronouns:pronouns`: Returns a player's pronouns with any styling that is configured.
+* `playerpronouns:raw_pronouns`: Returns a player's pronouns without any styling even if configured.
 
 ##### In chat with Styled Chat
 [Styled Chat](https://modrinth.com/mod/styled-chat) allows you to customise the formatting of chat messages.

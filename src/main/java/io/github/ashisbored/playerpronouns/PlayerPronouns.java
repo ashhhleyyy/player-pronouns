@@ -66,13 +66,14 @@ public class PlayerPronouns implements ModInitializer {
             if (!ctx.hasPlayer()) {
                 return PlaceholderResult.invalid("missing player");
             }
+            String defaultMessage = ctx.hasArgument() ? ctx.getArgument() : config.getDefaultPlaceholder();
             ServerPlayerEntity player = ctx.getPlayer();
             if (pronounDatabase == null) {
-                return PlaceholderResult.value("Unknown");
+                return PlaceholderResult.value(defaultMessage);
             }
             Pronouns pronouns = pronounDatabase.get(player.getUuid());
             if (pronouns == null) {
-                return PlaceholderResult.value("Unknown");
+                return PlaceholderResult.value(defaultMessage);
             }
             return PlaceholderResult.value(pronouns.formatted());
         });
@@ -81,13 +82,14 @@ public class PlayerPronouns implements ModInitializer {
             if (!ctx.hasPlayer()) {
                 return PlaceholderResult.invalid("missing player");
             }
+            String defaultMessage = ctx.hasArgument() ? ctx.getArgument() : config.getDefaultPlaceholder();
             ServerPlayerEntity player = ctx.getPlayer();
             if (pronounDatabase == null) {
-                return PlaceholderResult.value("Unknown");
+                return PlaceholderResult.value(defaultMessage);
             }
             Pronouns pronouns = pronounDatabase.get(player.getUuid());
             if (pronouns == null) {
-                return PlaceholderResult.value("Unknown");
+                return PlaceholderResult.value(defaultMessage);
             }
             return PlaceholderResult.value(pronouns.raw());
         });

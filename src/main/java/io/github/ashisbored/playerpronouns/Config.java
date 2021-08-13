@@ -22,21 +22,24 @@ public class Config {
     private static final Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("allow_custom").forGetter(config -> config.allowCustom),
             Pronoun.CODEC.listOf().fieldOf("single").forGetter(config -> config.single),
-            Pronoun.CODEC.listOf().fieldOf("pairs").forGetter(config -> config.pairs)
+            Pronoun.CODEC.listOf().fieldOf("pairs").forGetter(config -> config.pairs),
+            Codec.STRING.optionalFieldOf("default_placeholder", "Unknown").forGetter(config -> config.defaultPlaceholder)
     ).apply(instance, Config::new));
 
     private final boolean allowCustom;
     private final List<Pronoun> single;
     private final List<Pronoun> pairs;
+    private final String defaultPlaceholder;
 
-    private Config(boolean allowCustom, List<Pronoun> single, List<Pronoun> pairs) {
+    private Config(boolean allowCustom, List<Pronoun> single, List<Pronoun> pairs, String defaultPlaceholder) {
         this.allowCustom = allowCustom;
         this.single = single;
         this.pairs = pairs;
+        this.defaultPlaceholder = defaultPlaceholder;
     }
 
     private Config() {
-        this(true, Collections.emptyList(), Collections.emptyList());
+        this(true, Collections.emptyList(), Collections.emptyList(), "Unknown");
     }
 
     public boolean allowCustom() {
@@ -49,6 +52,10 @@ public class Config {
 
     public List<Pronoun> getPairs() {
         return pairs;
+    }
+
+    public String getDefaultPlaceholder() {
+        return defaultPlaceholder;
     }
 
     public static Config load() {
