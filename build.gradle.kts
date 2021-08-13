@@ -13,6 +13,11 @@ repositories {
         name = "NucleoidMC"
         url = uri("https://maven.nucleoid.xyz/")
     }
+    // permissions api
+    maven {
+        name = "Sonatype OSS"
+        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+    }
 }
 
 dependencies {
@@ -31,6 +36,10 @@ dependencies {
     // more-codecs
     modImplementation(libs.more.codecs)
     include(libs.more.codecs)
+
+    // fabric-api-permissions
+    modImplementation(libs.fabric.permissions)
+    include(libs.fabric.permissions)
 }
 
 tasks.processResources {

@@ -8,6 +8,8 @@ fabric-api = "0.37.1+1.17"
 placeholder-api = "1.0.1+1.17"
 more-codecs = "0.2.0"
 
+fabric-permissions = "0.1-SNAPSHOT"
+
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
 yarn = { module = "net.fabricmc:yarn", version.ref = "yarn" }
@@ -17,3 +19,5 @@ fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fab
 
 placeholder-api = { module = "eu.pb4:placeholder-api", version.ref = "placeholder-api" }
 more-codecs = { module = "xyz.nucleoid:more-codecs", version.ref = "more-codecs" }
+
+fabric-permissions = { module = "me.lucko:fabric-permissions-api", version.ref = "fabric-permissions" }

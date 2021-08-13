@@ -93,6 +93,11 @@ public class PlayerPronouns implements ModInitializer {
         });
     }
 
+    public static void reloadConfig() {
+        config = Config.load();
+        PronounList.load(config);
+    }
+
     private static void savePronounDatabase(MinecraftServer server) throws IOException {
         Path playerData = server.getSavePath(WorldSavePath.PLAYERDATA);
         if (!Files.exists(playerData)) {

@@ -28,8 +28,8 @@ public class PronounList {
     public PronounList(List<Pronoun> defaultSingle, List<Pronoun> defaultPairs, List<Pronoun> customSingle, List<Pronoun> customPairs) {
         this.defaultSingle = defaultSingle;
         this.defaultPairs = defaultPairs;
-        this.customSingle = customSingle;
-        this.customPairs = customPairs;
+        this.customSingle = new ArrayList<>(customSingle);
+        this.customPairs = new ArrayList<>(customPairs);
         this.calculatedPronounStrings = this.computePossibleCombinations();
     }
 
@@ -65,7 +65,8 @@ public class PronounList {
 
     public static void load(Config config) {
         if (INSTANCE != null) {
-            throw new IllegalStateException("PronounList has already been loaded!");
+            INSTANCE.reload(config);
+            return;
         }
 
         Pair<List<Pronoun>, List<Pronoun>> defaults = loadDefaults();
@@ -75,6 +76,15 @@ public class PronounList {
                 config.getSingle(),
                 config.getPairs()
         );
+    }
+
+    private void reload(Config config) {
+        this.customSingle.clear();
+        this.customPairs.clear();
+        this.customSingle.addAll(config.getSingle());
+        this.customPairs.addAll(config.getPairs());
+        this.calculatedPronounStrings.clear();
+        this.calculatedPronounStrings.putAll(this.computePossibleCombinations());
     }
 
     public static PronounList get() {

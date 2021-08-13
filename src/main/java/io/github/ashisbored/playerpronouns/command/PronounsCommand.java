@@ -5,6 +5,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import io.github.ashisbored.playerpronouns.PlayerPronouns;
 import io.github.ashisbored.playerpronouns.data.PronounList;
 import io.github.ashisbored.playerpronouns.data.Pronouns;
+import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
@@ -46,6 +47,13 @@ public class PronounsCommand {
                                         .formatted(Formatting.GREEN), false);
                             }
 
+                            return Command.SINGLE_SUCCESS;
+                        })
+                ).then(literal("reload-config")
+                        .requires(ctx -> Permissions.check(ctx, "playerpronouns.reload_config", 4))
+                        .executes(ctx -> {
+                            PlayerPronouns.reloadConfig();
+                            ctx.getSource().sendFeedback(new LiteralText("Reloaded the config!").formatted(Formatting.GREEN), true);
                             return Command.SINGLE_SUCCESS;
                         })
                 )
