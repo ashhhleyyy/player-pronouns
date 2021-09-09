@@ -1,6 +1,7 @@
 package io.github.ashisbored.playerpronouns;
 
 import eu.pb4.placeholders.PlaceholderAPI;
+import eu.pb4.placeholders.PlaceholderContext;
 import eu.pb4.placeholders.PlaceholderResult;
 import io.github.ashisbored.playerpronouns.command.PronounsCommand;
 import io.github.ashisbored.playerpronouns.data.PronounDatabase;
@@ -62,37 +63,31 @@ public class PlayerPronouns implements ModInitializer {
             PronounsCommand.register(dispatcher);
         });
 
-        PlaceholderAPI.register(new Identifier(MOD_ID, "pronouns"), ctx -> {
-            if (!ctx.hasPlayer()) {
-                return PlaceholderResult.invalid("missing player");
-            }
-            String defaultMessage = ctx.hasArgument() ? ctx.getArgument() : config.getDefaultPlaceholder();
-            ServerPlayerEntity player = ctx.getPlayer();
-            if (pronounDatabase == null) {
-                return PlaceholderResult.value(defaultMessage);
-            }
-            Pronouns pronouns = pronounDatabase.get(player.getUuid());
-            if (pronouns == null) {
-                return PlaceholderResult.value(defaultMessage);
-            }
-            return PlaceholderResult.value(pronouns.formatted());
-        });
+        PlaceholderAPI.register(new Identifier(MOD_ID, "pronouns"), ctx ->
+                PlayerPronouns.fromContext(ctx, false));
 
-        PlaceholderAPI.register(new Identifier(MOD_ID, "raw_pronouns"), ctx -> {
-            if (!ctx.hasPlayer()) {
-                return PlaceholderResult.invalid("missing player");
-            }
-            String defaultMessage = ctx.hasArgument() ? ctx.getArgument() : config.getDefaultPlaceholder();
-            ServerPlayerEntity player = ctx.getPlayer();
-            if (pronounDatabase == null) {
-                return PlaceholderResult.value(defaultMessage);
-            }
-            Pronouns pronouns = pronounDatabase.get(player.getUuid());
-            if (pronouns == null) {
-                return PlaceholderResult.value(defaultMessage);
-            }
+        PlaceholderAPI.register(new Identifier(MOD_ID, "raw_pronouns"), ctx ->
+                PlayerPronouns.fromContext(ctx, false));
+    }
+
+    private static PlaceholderResult fromContext(PlaceholderContext ctx, boolean formatted) {
+        if (!ctx.hasPlayer()) {
+            return PlaceholderResult.invalid("missing player");
+        }
+        String defaultMessage = ctx.hasArgument() ? ctx.getArgument() : config.getDefaultPlaceholder();
+        ServerPlayerEntity player = ctx.getPlayer();
+        if (pronounDatabase == null) {
+            return PlaceholderResult.value(defaultMessage);
+        }
+        Pronouns pronouns = pronounDatabase.get(player.getUuid());
+        if (pronouns == null) {
+            return PlaceholderResult.value(defaultMessage);
+        }
+        if (formatted) {
+            return PlaceholderResult.value(pronouns.formatted());
+        } else {
             return PlaceholderResult.value(pronouns.raw());
-        });
+        }
     }
 
     public static void reloadConfig() {
