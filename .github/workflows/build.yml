@@ -9,14 +9,16 @@ jobs:
         uses: actions/checkout@v2
       - name: Validate gradle wrapper
         uses: gradle/wrapper-validation-action@v1
-      - name: Setup JDK 16
+      - name: Setup JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 16
+          java-version: 17
       - name: Ensure gradlew is executable
         run: chmod +x ./gradlew
       - name: Build with gradle
-        run: ./gradlew build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
