@@ -76,8 +76,7 @@ public class Config {
         } else {
             try {
                 String s = Files.readString(path);
-                JsonParser parser = new JsonParser();
-                JsonElement ele = parser.parse(s);
+                JsonElement ele = JsonParser.parseString(s);
                 DataResult<Config> result = CODEC.decode(JsonOps.INSTANCE, ele).map(Pair::getFirst);
                 Optional<DataResult.PartialResult<Config>> err = result.error();
                 err.ifPresent(e -> PlayerPronouns.LOGGER.warn("Failed to load config: {}", e.message()));
