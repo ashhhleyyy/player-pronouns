@@ -64,7 +64,7 @@ public class PlayerPronouns implements ModInitializer {
         });
 
         PlaceholderAPI.register(new Identifier(MOD_ID, "pronouns"), ctx ->
-                PlayerPronouns.fromContext(ctx, false));
+                PlayerPronouns.fromContext(ctx, true));
 
         PlaceholderAPI.register(new Identifier(MOD_ID, "raw_pronouns"), ctx ->
                 PlayerPronouns.fromContext(ctx, false));
