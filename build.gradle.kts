@@ -1,11 +1,11 @@
 plugins {
-    id("fabric-loom") version "0.9.45"
-    id("io.github.juuxel.loom-quiltflower") version "1.2.1"
+    id("fabric-loom") version "0.10.+"
+    id("io.github.juuxel.loom-quiltflower-mini") version "1.2.1"
     `maven-publish`
 }
 
-version = "1.2.0"
-group = "io.github.ashisbored"
+version = "1.3.0+1.18"
+group = "io.github.ashhhleyyy"
 
 repositories {
     // needed for placeholder-api

@@ -25,7 +25,6 @@ import java.util.UUID;
  */
 public class PalettePronounDatabase implements PronounDatabase {
     public static final int VERSION_NUMBER = 1;
-    private static final JsonParser JSON_PARSER = new JsonParser();
     private final Object2ObjectMap<UUID, Pronouns> data;
 
     protected PalettePronounDatabase(Object2ObjectMap<UUID, Pronouns> data) {
@@ -107,7 +106,7 @@ public class PalettePronounDatabase implements PronounDatabase {
             int paletteSize = in.readInt();
             for (int i = 0; i < paletteSize; i++) {
                 String s = in.readUTF();
-                Optional<Pronouns> optionalPronouns = Pronouns.CODEC.decode(JsonOps.INSTANCE, JSON_PARSER.parse(s)).resultOrPartial(e -> {
+                Optional<Pronouns> optionalPronouns = Pronouns.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseString(s)).resultOrPartial(e -> {
                     throw new RuntimeException(new IOException("Invalid pronouns in database: " + s));
                 }).map(com.mojang.datafixers.util.Pair::getFirst);
                 if (optionalPronouns.isEmpty()) {

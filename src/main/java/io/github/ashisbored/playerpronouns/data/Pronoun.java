@@ -52,7 +52,7 @@ public record Pronoun(
                 case "italic" -> style = style.withItalic(true);
                 case "strikethrough" -> style = style.withStrikethrough(true);
                 case "underline" -> style = style.withUnderline(true);
-                case "obfuscated" -> style = style.obfuscated(true);
+                case "obfuscated" -> style = style.withObfuscated(true);
                 default -> {
                     TextColor col = TextColor.parse(format);
                     if (col != null) {

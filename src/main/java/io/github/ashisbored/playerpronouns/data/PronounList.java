@@ -97,7 +97,7 @@ public class PronounList {
     private static Pair<List<Pronoun>, List<Pronoun>> loadDefaults() {
         try (InputStream is = Objects.requireNonNull(PronounList.class.getResourceAsStream("/default_pronouns.json"));
              InputStreamReader reader = new InputStreamReader(is)) {
-            JsonObject ele = new JsonParser().parse(reader).getAsJsonObject();
+            JsonObject ele = JsonParser.parseReader(reader).getAsJsonObject();
             JsonArray jsonSingle = ele.getAsJsonArray("single");
             JsonArray jsonPairs = ele.getAsJsonArray("pairs");
             List<Pronoun> single = new ArrayList<>();
