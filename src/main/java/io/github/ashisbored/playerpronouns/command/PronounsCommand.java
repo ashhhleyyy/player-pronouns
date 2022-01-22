@@ -56,6 +56,17 @@ public class PronounsCommand {
                             ctx.getSource().sendFeedback(new LiteralText("Reloaded the config!").formatted(Formatting.GREEN), true);
                             return Command.SINGLE_SUCCESS;
                         })
+                ).then(literal("unset")
+                        .executes(ctx -> {
+                            ServerPlayerEntity player = ctx.getSource().getPlayer();
+                            if (!PlayerPronouns.setPronouns(player, null)) {
+                                ctx.getSource().sendError(new LiteralText("Failed to update pronouns, sorry"));
+                            } else {
+                                ctx.getSource().sendFeedback(new LiteralText("Cleared your pronouns!")
+                                        .formatted(Formatting.GREEN), false);
+                            }
+                            return Command.SINGLE_SUCCESS;
+                        })
                 )
         );
     }

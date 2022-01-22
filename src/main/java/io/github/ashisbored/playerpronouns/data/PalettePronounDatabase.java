@@ -36,8 +36,12 @@ public class PalettePronounDatabase implements PronounDatabase {
     }
 
     @Override
-    public void put(UUID player, Pronouns pronouns) {
-        this.data.put(player, pronouns);
+    public void put(UUID player, @Nullable Pronouns pronouns) {
+        if (pronouns == null) {
+            this.data.remove(player);
+        } else {
+            this.data.put(player, pronouns);
+        }
     }
 
     @Override

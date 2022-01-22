@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 public interface PronounDatabase {
-    void put(UUID player, Pronouns pronouns);
+    void put(UUID player, @Nullable Pronouns pronouns);
     @Nullable Pronouns get(UUID player);
     void save(Path path) throws IOException;
 

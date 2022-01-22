@@ -16,6 +16,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.WorldSavePath;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -103,7 +104,7 @@ public class PlayerPronouns implements ModInitializer {
         pronounDatabase.save(playerData.resolve("pronouns.dat"));
     }
 
-    public static boolean setPronouns(ServerPlayerEntity player, Pronouns pronouns) {
+    public static boolean setPronouns(ServerPlayerEntity player, @Nullable Pronouns pronouns) {
         if (pronounDatabase == null) return false;
 
         pronounDatabase.put(player.getUuid(), pronouns);
