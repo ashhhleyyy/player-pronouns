@@ -8,7 +8,6 @@ import io.github.ashisbored.playerpronouns.data.Pronouns;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
@@ -28,7 +27,7 @@ public class PronounsCommand {
 
                             Map<String, Text> pronounTexts = PronounList.get().getCalculatedPronounStrings();
                             if (!PlayerPronouns.config.allowCustom() && !pronounTexts.containsKey(pronounsString)) {
-                                ctx.getSource().sendError(new LiteralText("Custom pronouns have been disabled by the server administrator."));
+                                ctx.getSource().sendError(Text.literal("Custom pronouns have been disabled by the server administrator."));
                                 return 0;
                             }
 
@@ -36,13 +35,13 @@ public class PronounsCommand {
                             if (pronounTexts.containsKey(pronounsString)) {
                                 pronouns = new Pronouns(pronounsString, pronounTexts.get(pronounsString));
                             } else {
-                                pronouns = new Pronouns(pronounsString, new LiteralText(pronounsString));
+                                pronouns = new Pronouns(pronounsString, Text.literal(pronounsString));
                             }
 
                             if (!PlayerPronouns.setPronouns(player, pronouns)) {
-                                ctx.getSource().sendError(new LiteralText("Failed to update pronouns, sorry"));
+                                ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
                             } else {
-                                ctx.getSource().sendFeedback(new LiteralText("Updated your pronouns to ")
+                                ctx.getSource().sendFeedback(Text.literal("Updated your pronouns to ")
                                         .append(pronouns.formatted())
                                         .formatted(Formatting.GREEN), false);
                             }
@@ -53,16 +52,16 @@ public class PronounsCommand {
                         .requires(ctx -> Permissions.check(ctx, "playerpronouns.reload_config", 4))
                         .executes(ctx -> {
                             PlayerPronouns.reloadConfig();
-                            ctx.getSource().sendFeedback(new LiteralText("Reloaded the config!").formatted(Formatting.GREEN), true);
+                            ctx.getSource().sendFeedback(Text.literal("Reloaded the config!").formatted(Formatting.GREEN), true);
                             return Command.SINGLE_SUCCESS;
                         })
                 ).then(literal("unset")
                         .executes(ctx -> {
                             ServerPlayerEntity player = ctx.getSource().getPlayer();
                             if (!PlayerPronouns.setPronouns(player, null)) {
-                                ctx.getSource().sendError(new LiteralText("Failed to update pronouns, sorry"));
+                                ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
                             } else {
-                                ctx.getSource().sendFeedback(new LiteralText("Cleared your pronouns!")
+                                ctx.getSource().sendFeedback(Text.literal("Cleared your pronouns!")
                                         .formatted(Formatting.GREEN), false);
                             }
                             return Command.SINGLE_SUCCESS;

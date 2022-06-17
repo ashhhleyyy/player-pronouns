@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import io.github.ashisbored.playerpronouns.Config;
 import io.github.ashisbored.playerpronouns.PlayerPronouns;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -53,9 +52,9 @@ public class PronounList {
                 if (i == j) continue;
                 Pronoun a = combinedPairs.get(i);
                 Pronoun b = combinedPairs.get(j);
-                MutableText combined = new LiteralText("");
+                MutableText combined = Text.literal("");
                 combined.append(a.toText());
-                combined.append(new LiteralText("/"));
+                combined.append(Text.literal("/"));
                 combined.append(b.toText());
                 ret.put(a.pronoun() + "/" + b.pronoun(), combined);
             }

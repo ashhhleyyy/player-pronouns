@@ -92,7 +92,7 @@ public record Pronoun(
     }
 
     public MutableText toText() {
-        return new LiteralText(this.pronoun).setStyle(this.style);
+        return Text.literal(this.pronoun).setStyle(this.style);
     }
 
     @Override
