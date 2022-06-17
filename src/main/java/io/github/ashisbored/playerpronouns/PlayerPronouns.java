@@ -1,31 +1,67 @@
 package io.github.ashisbored.playerpronouns;
 
+import com.google.gson.JsonObject;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
 import io.github.ashisbored.playerpronouns.command.PronounsCommand;
+import io.github.ashisbored.playerpronouns.data.Pronoun;
 import io.github.ashisbored.playerpronouns.data.PronounDatabase;
 import io.github.ashisbored.playerpronouns.data.PronounList;
 import io.github.ashisbored.playerpronouns.data.Pronouns;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
 import net.minecraft.util.WorldSavePath;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.include.com.google.common.base.Charsets;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class PlayerPronouns implements ModInitializer {
     public static final Logger LOGGER = LogManager.getLogger();
     public static final String MOD_ID = "playerpronouns";
+    private static final Map<String, String> PRONOUNDB_ID_MAP = new HashMap<>() {{
+        // short pronoun set identifier map from https://pronoundb.org/docs
+        put("unspecified", "ask"); // default if unknown
+        put("hh", "he/him");
+        put("hi", "he/it");
+        put("hs", "he/she");
+        put("ht", "he/they");
+        put("ih", "it/he");
+        put("ii", "it/its");
+        put("is", "it/she");
+        put("it", "it/they");
+        put("shh", "she/he");
+        put("sh", "she/her");
+        put("si", "she/it");
+        put("st", "she/they");
+        put("th", "they/he");
+        put("ti", "they/it");
+        put("ts", "they/she");
+        put("tt", "they/them");
+        put("any", "any");
+        put("other", "other");
+        put("ask", "ask");
+        put("avoid", "avoid");
+    }};
 
     private static PronounDatabase pronounDatabase;
     public static Config config;
@@ -55,6 +91,23 @@ public class PlayerPronouns implements ModInitializer {
                     savePronounDatabase(server);
                 } catch (IOException e) {
                     LOGGER.error("Failed to save pronoun database!", e);
+                }
+            }
+        });
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            if(config.enablePronounDBSync()) {
+                String pronounDbUrl = "https://pronoundb.org/api/v1/lookup?platform=minecraft&id=%s".formatted(handler.getPlayer().getUuid());
+                try(CloseableHttpClient client = HttpClients.createMinimal();
+                    CloseableHttpResponse resp = client.execute(new HttpGet(pronounDbUrl))) {
+
+                    if(resp.getStatusLine().getStatusCode() == 200) {
+                        JsonObject json = JsonHelper.deserialize(new String(resp.getEntity().getContent().readAllBytes(), Charsets.UTF_8));
+                        String pronouns = PRONOUNDB_ID_MAP.getOrDefault(json.get("pronouns").getAsString(), "ask");
+                        setPronouns(handler.getPlayer(), new Pronouns(pronouns, PronounList.get().getCalculatedPronounStrings().get(pronouns)));
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
         });
