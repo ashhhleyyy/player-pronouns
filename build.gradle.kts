@@ -1,10 +1,10 @@
 plugins {
-    id("fabric-loom") version "0.10.+"
-    id("io.github.juuxel.loom-quiltflower-mini") version "1.2.1"
+    id("fabric-loom") version "0.12.+"
+    id("io.github.juuxel.loom-quiltflower") version "1.7.+"
     `maven-publish`
 }
 
-version = "1.4.0+1.18"
+version = "1.4.0+1.19"
 group = "io.github.ashhhleyyy"
 
 repositories {
@@ -51,15 +51,15 @@ tasks.processResources {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 
     withSourcesJar()
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.release.set(16)
+    options.release.set(17)
 }
 
 tasks.jar {

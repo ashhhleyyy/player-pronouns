@@ -2,7 +2,6 @@ package io.github.ashisbored.playerpronouns.data;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +54,7 @@ public class BinaryPronounDatabase {
         Object2ObjectMap<UUID, Pronouns> pronouns = new Object2ObjectOpenHashMap<>();
         Map<String, Text> pronounStrings = PronounList.get().getCalculatedPronounStrings();
         for (var entry : BinaryPronounDatabase.load(path).data.entrySet()) {
-            Text formatted = new LiteralText(entry.getValue());
+            Text formatted = Text.literal(entry.getValue());
             if (pronounStrings.containsKey(entry.getValue())) {
                 formatted = pronounStrings.get(entry.getValue());
             }

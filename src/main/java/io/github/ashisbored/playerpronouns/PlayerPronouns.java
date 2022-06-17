@@ -1,14 +1,14 @@
 package io.github.ashisbored.playerpronouns;
 
-import eu.pb4.placeholders.PlaceholderAPI;
-import eu.pb4.placeholders.PlaceholderContext;
-import eu.pb4.placeholders.PlaceholderResult;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.PlaceholderResult;
+import eu.pb4.placeholders.api.Placeholders;
 import io.github.ashisbored.playerpronouns.command.PronounsCommand;
 import io.github.ashisbored.playerpronouns.data.PronounDatabase;
 import io.github.ashisbored.playerpronouns.data.PronounList;
 import io.github.ashisbored.playerpronouns.data.Pronouns;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -60,23 +60,23 @@ public class PlayerPronouns implements ModInitializer {
         });
 
         //noinspection CodeBlock2Expr
-        CommandRegistrationCallback.EVENT.register((dispatcher, __) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registry, env) -> {
             PronounsCommand.register(dispatcher);
         });
 
-        PlaceholderAPI.register(new Identifier(MOD_ID, "pronouns"), ctx ->
-                PlayerPronouns.fromContext(ctx, true));
+        Placeholders.register(new Identifier(MOD_ID, "pronouns"), (ctx, argument)->
+                PlayerPronouns.fromContext(ctx, argument, true));
 
-        PlaceholderAPI.register(new Identifier(MOD_ID, "raw_pronouns"), ctx ->
-                PlayerPronouns.fromContext(ctx, false));
+        Placeholders.register(new Identifier(MOD_ID, "raw_pronouns"), (ctx, argument)->
+                PlayerPronouns.fromContext(ctx, argument, false));
     }
 
-    private static PlaceholderResult fromContext(PlaceholderContext ctx, boolean formatted) {
+    private static PlaceholderResult fromContext(PlaceholderContext ctx, @Nullable String argument, boolean formatted) {
         if (!ctx.hasPlayer()) {
             return PlaceholderResult.invalid("missing player");
         }
-        String defaultMessage = ctx.hasArgument() ? ctx.getArgument() : config.getDefaultPlaceholder();
-        ServerPlayerEntity player = ctx.getPlayer();
+        String defaultMessage = argument != null ? argument : config.getDefaultPlaceholder();
+        ServerPlayerEntity player = ctx.player();
         if (pronounDatabase == null) {
             return PlaceholderResult.value(defaultMessage);
         }
