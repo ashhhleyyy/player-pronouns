@@ -42,6 +42,10 @@ dependencies {
     include(libs.fabric.permissions)
 }
 
+loom {
+    runtimeOnlyLog4j.set(true)
+}
+
 tasks.processResources {
     inputs.property("version", project.version)
 

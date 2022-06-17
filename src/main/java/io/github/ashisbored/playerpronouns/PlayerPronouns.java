@@ -5,7 +5,6 @@ import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
 import io.github.ashisbored.playerpronouns.command.PronounsCommand;
-import io.github.ashisbored.playerpronouns.data.Pronoun;
 import io.github.ashisbored.playerpronouns.data.PronounDatabase;
 import io.github.ashisbored.playerpronouns.data.PronounList;
 import io.github.ashisbored.playerpronouns.data.Pronouns;
@@ -15,7 +14,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.WorldSavePath;
@@ -23,9 +21,9 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.include.com.google.common.base.Charsets;
 
 import java.io.IOException;
@@ -36,7 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class PlayerPronouns implements ModInitializer {
-    public static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LoggerFactory.getLogger(PlayerPronouns.class);
     public static final String MOD_ID = "playerpronouns";
     private static final Map<String, String> PRONOUNDB_ID_MAP = new HashMap<>() {{
         // short pronoun set identifier map from https://pronoundb.org/docs
