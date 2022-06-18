@@ -122,7 +122,7 @@ public class PlayerPronouns implements ModInitializer {
                                 setPronouns(handler.getPlayer(), new Pronouns(pronouns, PronounList.get().getCalculatedPronounStrings().get(pronouns)));
                             }).join();
                 } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
+                    e.printStackTrace();
                 }
             }
         });
