@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import net.minecraft.util.WorldSavePath;
@@ -27,8 +28,14 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.include.com.google.common.base.Charsets;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -95,16 +102,26 @@ public class PlayerPronouns implements ModInitializer {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if(config.enablePronounDBSync()) {
-                String pronounDbUrl = "https://pronoundb.org/api/v1/lookup?platform=minecraft&id=%s".formatted(handler.getPlayer().getUuid());
-                try(CloseableHttpClient client = HttpClients.createMinimal();
-                    CloseableHttpResponse resp = client.execute(new HttpGet(pronounDbUrl))) {
-
-                    if(resp.getStatusLine().getStatusCode() == 200) {
-                        JsonObject json = JsonHelper.deserialize(new String(resp.getEntity().getContent().readAllBytes(), Charsets.UTF_8));
-                        String pronouns = PRONOUNDB_ID_MAP.getOrDefault(json.get("pronouns").getAsString(), "ask");
-                        setPronouns(handler.getPlayer(), new Pronouns(pronouns, PronounList.get().getCalculatedPronounStrings().get(pronouns)));
-                    }
-                } catch (IOException e) {
+                var pronounDbUrl = "https://pronoundb.org/api/v1/lookup?platform=minecraft&id=%s"
+                                            .formatted(handler.getPlayer().getUuid());
+                try {
+                    var client = HttpClient.newBuilder()
+                            .version(HttpClient.Version.HTTP_2)
+                            .followRedirects(HttpClient.Redirect.NORMAL)
+                            .build();
+                    var req = HttpRequest.newBuilder()
+                            .uri(new URI(pronounDbUrl))
+                            .GET()
+                            .timeout(Duration.ofSeconds(10))
+                            .build();
+                    client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
+                            .thenApply(HttpResponse::body)
+                            .thenAccept(body -> {
+                                var json = JsonHelper.deserialize(body);
+                                var pronouns = PRONOUNDB_ID_MAP.getOrDefault(json.get("pronouns").getAsString(), "ask");
+                                setPronouns(handler.getPlayer(), new Pronouns(pronouns, PronounList.get().getCalculatedPronounStrings().get(pronouns)));
+                            }).join();
+                } catch (URISyntaxException e) {
                     throw new RuntimeException(e);
                 }
             }
