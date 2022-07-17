@@ -5,7 +5,7 @@ plugins {
     `maven-publish`
 }
 
-version = "1.4.0+1.19"
+version = "1.5.0+1.19"
 group = "io.github.ashhhleyyy"
 
 repositories {
