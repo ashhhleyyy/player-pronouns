@@ -140,6 +140,7 @@ public class PlayerPronouns implements ModInitializer {
         }
         String defaultMessage = argument != null ? argument : config.getDefaultPlaceholder();
         ServerPlayerEntity player = ctx.player();
+        assert player != null;
         if (pronounDatabase == null) {
             return PlaceholderResult.value(defaultMessage);
         }
