@@ -31,7 +31,7 @@ jobs:
       - name: Build and publish with gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: build
+          arguments: modrinth
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
 
