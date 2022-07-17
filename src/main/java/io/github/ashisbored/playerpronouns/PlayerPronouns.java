@@ -36,6 +36,8 @@ import java.util.Objects;
 public class PlayerPronouns implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(PlayerPronouns.class);
     public static final String MOD_ID = "playerpronouns";
+    private static final String USER_AGENT = "player-pronouns/1.0 (+https://ashhhleyyy.dev/projects/2021/player-pronouns)";
+
     private static final Map<String, String> PRONOUNDB_ID_MAP = new HashMap<>() {{
         // short pronoun set identifier map from https://pronoundb.org/docs
         put("hh", "he/him");
@@ -107,6 +109,7 @@ public class PlayerPronouns implements ModInitializer {
                             .build();
                     var req = HttpRequest.newBuilder()
                             .uri(new URI(pronounDbUrl))
+                            .header("User-Agent", USER_AGENT)
                             .GET()
                             .timeout(Duration.ofSeconds(10))
                             .build();
