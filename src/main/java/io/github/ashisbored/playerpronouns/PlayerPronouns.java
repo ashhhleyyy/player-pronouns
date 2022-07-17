@@ -1,5 +1,6 @@
 package io.github.ashisbored.playerpronouns;
 
+import com.google.gson.JsonObject;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
@@ -10,22 +11,62 @@ import io.github.ashisbored.playerpronouns.data.Pronouns;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.JsonHelper;
 import net.minecraft.util.WorldSavePath;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.spongepowered.include.com.google.common.base.Charsets;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class PlayerPronouns implements ModInitializer {
-    public static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LoggerFactory.getLogger(PlayerPronouns.class);
     public static final String MOD_ID = "playerpronouns";
+    private static final Map<String, String> PRONOUNDB_ID_MAP = new HashMap<>() {{
+        // short pronoun set identifier map from https://pronoundb.org/docs
+        put("unspecified", "ask"); // default if unknown
+        put("hh", "he/him");
+        put("hi", "he/it");
+        put("hs", "he/she");
+        put("ht", "he/they");
+        put("ih", "it/he");
+        put("ii", "it/its");
+        put("is", "it/she");
+        put("it", "it/they");
+        put("shh", "she/he");
+        put("sh", "she/her");
+        put("si", "she/it");
+        put("st", "she/they");
+        put("th", "they/he");
+        put("ti", "they/it");
+        put("ts", "they/she");
+        put("tt", "they/them");
+        put("any", "any");
+        put("other", "other");
+        put("ask", "ask");
+        put("avoid", "avoid");
+    }};
 
     private static PronounDatabase pronounDatabase;
     public static Config config;
@@ -55,6 +96,33 @@ public class PlayerPronouns implements ModInitializer {
                     savePronounDatabase(server);
                 } catch (IOException e) {
                     LOGGER.error("Failed to save pronoun database!", e);
+                }
+            }
+        });
+
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            if(config.enablePronounDBSync()) {
+                var pronounDbUrl = "https://pronoundb.org/api/v1/lookup?platform=minecraft&id=%s"
+                                            .formatted(handler.getPlayer().getUuid());
+                try {
+                    var client = HttpClient.newBuilder()
+                            .version(HttpClient.Version.HTTP_2)
+                            .followRedirects(HttpClient.Redirect.NORMAL)
+                            .build();
+                    var req = HttpRequest.newBuilder()
+                            .uri(new URI(pronounDbUrl))
+                            .GET()
+                            .timeout(Duration.ofSeconds(10))
+                            .build();
+                    client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
+                            .thenApply(HttpResponse::body)
+                            .thenAccept(body -> {
+                                var json = JsonHelper.deserialize(body);
+                                var pronouns = PRONOUNDB_ID_MAP.getOrDefault(json.get("pronouns").getAsString(), "ask");
+                                setPronouns(handler.getPlayer(), new Pronouns(pronouns, PronounList.get().getCalculatedPronounStrings().get(pronouns)));
+                            }).join();
+                } catch (URISyntaxException e) {
+                    e.printStackTrace();
                 }
             }
         });

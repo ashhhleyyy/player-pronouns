@@ -21,29 +21,36 @@ import java.util.Optional;
 public class Config {
     private static final Codec<Config> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("allow_custom").forGetter(config -> config.allowCustom),
+            Codec.BOOL.fieldOf("enable_pronoundb_sync").forGetter(config -> config.enablePronounDBSync),
             Pronoun.CODEC.listOf().fieldOf("single").forGetter(config -> config.single),
             Pronoun.CODEC.listOf().fieldOf("pairs").forGetter(config -> config.pairs),
             Codec.STRING.optionalFieldOf("default_placeholder", "Unknown").forGetter(config -> config.defaultPlaceholder)
     ).apply(instance, Config::new));
 
     private final boolean allowCustom;
+    private final boolean enablePronounDBSync;
     private final List<Pronoun> single;
     private final List<Pronoun> pairs;
     private final String defaultPlaceholder;
 
-    private Config(boolean allowCustom, List<Pronoun> single, List<Pronoun> pairs, String defaultPlaceholder) {
+    private Config(boolean allowCustom, boolean enablePronounDBSync, List<Pronoun> single, List<Pronoun> pairs, String defaultPlaceholder) {
         this.allowCustom = allowCustom;
+        this.enablePronounDBSync = enablePronounDBSync;
         this.single = single;
         this.pairs = pairs;
         this.defaultPlaceholder = defaultPlaceholder;
     }
 
     private Config() {
-        this(true, Collections.emptyList(), Collections.emptyList(), "Unknown");
+        this(true, true, Collections.emptyList(), Collections.emptyList(), "Unknown");
     }
 
     public boolean allowCustom() {
         return allowCustom;
+    }
+
+    public boolean enablePronounDBSync() {
+        return enablePronounDBSync;
     }
 
     public List<Pronoun> getSingle() {
