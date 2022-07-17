@@ -58,7 +58,7 @@ public class BinaryPronounDatabase {
             if (pronounStrings.containsKey(entry.getValue())) {
                 formatted = pronounStrings.get(entry.getValue());
             }
-            pronouns.put(entry.getKey(), new Pronouns(entry.getValue(), formatted));
+            pronouns.put(entry.getKey(), new Pronouns(entry.getValue(), formatted, false));
         }
         return new PalettePronounDatabase(pronouns);
     }

@@ -33,9 +33,9 @@ public class PronounsCommand {
 
                             Pronouns pronouns;
                             if (pronounTexts.containsKey(pronounsString)) {
-                                pronouns = new Pronouns(pronounsString, pronounTexts.get(pronounsString));
+                                pronouns = new Pronouns(pronounsString, pronounTexts.get(pronounsString), false);
                             } else {
-                                pronouns = new Pronouns(pronounsString, Text.literal(pronounsString));
+                                pronouns = new Pronouns(pronounsString, Text.literal(pronounsString), false);
                             }
 
                             if (!PlayerPronouns.setPronouns(player, pronouns)) {

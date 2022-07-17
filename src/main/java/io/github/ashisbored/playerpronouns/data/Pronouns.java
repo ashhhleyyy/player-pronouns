@@ -7,10 +7,12 @@ import xyz.nucleoid.codecs.MoreCodecs;
 
 public record Pronouns(
         String raw,
-        Text formatted
+        Text formatted,
+        boolean remote
 ) {
     public static final Codec<Pronouns> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("raw").forGetter(Pronouns::raw),
-            MoreCodecs.TEXT.fieldOf("formatted").forGetter(Pronouns::formatted)
+            MoreCodecs.TEXT.fieldOf("formatted").forGetter(Pronouns::formatted),
+            Codec.BOOL.optionalFieldOf("remote", false).forGetter(Pronouns::remote)
     ).apply(instance, Pronouns::new));
 }

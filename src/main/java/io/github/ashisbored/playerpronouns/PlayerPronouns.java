@@ -94,6 +94,10 @@ public class PlayerPronouns implements ModInitializer {
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             if(config.enablePronounDBSync()) {
+                // Do not override player-set pronouns
+                var currentPronouns = pronounDatabase.get(handler.getPlayer().getUuid());
+                if (currentPronouns != null && !currentPronouns.remote()) return;
+
                 var pronounDbUrl = "https://pronoundb.org/api/v1/lookup?platform=minecraft&id=%s"
                                             .formatted(handler.getPlayer().getUuid());
                 try {
@@ -109,13 +113,17 @@ public class PlayerPronouns implements ModInitializer {
                     client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
                             .thenApply(HttpResponse::body)
                             .thenAcceptAsync(body -> {
+                                // Do not override player-set pronouns (repeated to prevent race-condition from network delays)
+                                var currentPronouns2 = pronounDatabase.get(handler.getPlayer().getUuid());
+                                if (currentPronouns2 != null && !currentPronouns2.remote()) return;
+
                                 var json = JsonHelper.deserialize(body);
                                 var pronounsResponse = json.get("pronouns").getAsString();
                                 if (!"unspecified".equals(pronounsResponse)) {
                                     var pronouns = PRONOUNDB_ID_MAP.getOrDefault(pronounsResponse, "ask");
-                                    setPronouns(handler.getPlayer(), new Pronouns(pronouns, PronounList.get().getCalculatedPronounStrings().get(pronouns)));
+                                    setPronouns(handler.getPlayer(), new Pronouns(pronouns, PronounList.get().getCalculatedPronounStrings().get(pronouns), true));
                                 }
-                            }, server).join();
+                            }, server);
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
