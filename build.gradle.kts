@@ -1,6 +1,7 @@
 plugins {
     id("fabric-loom") version "0.12.+"
     id("io.github.juuxel.loom-quiltflower") version "1.7.+"
+    id("com.modrinth.minotaur") version "2.+"
     `maven-publish`
 }
 
@@ -69,5 +70,13 @@ tasks.withType<JavaCompile> {
 tasks.jar {
     from("LICENSE") {
         rename { "${it}_${project.name}" }
+    }
+}
+
+modrinth {
+    projectId.set("player-pronouns")
+    uploadFile.set(tasks.remapJar.get())
+    dependencies {
+        required.project("fabric-api")
     }
 }
