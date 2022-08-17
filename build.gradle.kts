@@ -6,7 +6,7 @@ plugins {
 }
 
 version = "1.5.0+1.19"
-group = "io.github.ashhhleyyy"
+group = "dev.ashhhleyyy"
 
 repositories {
     // needed for placeholder-api
@@ -78,5 +78,26 @@ modrinth {
     uploadFile.set(tasks.remapJar.get())
     dependencies {
         required.project("fabric-api")
+    }
+}
+
+publishing {
+    publications.create<MavenPublication>("maven") {
+        from(components["java"])
+    }
+
+    repositories {
+        if (System.getenv("MAVEN_URL") != null) {
+            maven {
+                name = "ashhhleyyy"
+                setUrl(System.getenv("MAVEN_URL"))
+                credentials {
+                    username = System.getenv("MAVEN_USERNAME")
+                    password = System.getenv("MAVEN_PASSWORD")
+                }
+            }
+        } else {
+            mavenLocal()
+        }
     }
 }

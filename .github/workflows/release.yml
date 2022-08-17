@@ -31,9 +31,12 @@ jobs:
       - name: Build and publish with gradle
         uses: gradle/gradle-build-action@v2
         with:
-          arguments: modrinth
+          arguments: modrinth publish
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          MAVEN_URL: ${{ secrets.MAVEN_URL }}
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
 
       - name: Upload GitHub release
         uses: AButler/upload-release-assets@v2.0
