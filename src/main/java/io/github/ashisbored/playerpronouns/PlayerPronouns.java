@@ -191,4 +191,9 @@ public class PlayerPronouns implements ModInitializer {
 
         return true;
     }
+
+    public static @Nullable Pronouns getPronouns(ServerPlayerEntity player) {
+        if (pronounDatabase == null) return null;
+        return pronounDatabase.get(player.getUuid());
+    }
 }
