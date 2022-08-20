@@ -5,8 +5,8 @@ plugins {
     `maven-publish`
 }
 
-version = "1.5.0+1.19"
-group = "dev.ashhhleyyy"
+version = "1.6.0+1.19"
+group = "io.github.ashhhleyyy"
 
 repositories {
     // needed for placeholder-api

@@ -32,6 +32,7 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class PlayerPronouns implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(PlayerPronouns.class);
@@ -190,5 +191,14 @@ public class PlayerPronouns implements ModInitializer {
         }
 
         return true;
+    }
+
+    public static @Nullable Pronouns getPronouns(ServerPlayerEntity player) {
+        return getPronouns(player.getUuid());
+    }
+
+    public static @Nullable Pronouns getPronouns(UUID playerId) {
+        if (pronounDatabase == null) return null;
+        return pronounDatabase.get(playerId);
     }
 }
