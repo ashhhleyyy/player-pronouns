@@ -80,3 +80,24 @@ modrinth {
         required.project("fabric-api")
     }
 }
+
+publishing {
+    publications.create<MavenPublication>("maven") {
+        from(components["java"])
+    }
+
+    repositories {
+        if (System.getenv("MAVEN_URL") != null) {
+            maven {
+                name = "ashhhleyyy"
+                setUrl(System.getenv("MAVEN_URL"))
+                credentials {
+                    username = System.getenv("MAVEN_USERNAME")
+                    password = System.getenv("MAVEN_PASSWORD")
+                }
+            }
+        } else {
+            mavenLocal()
+        }
+    }
+}
