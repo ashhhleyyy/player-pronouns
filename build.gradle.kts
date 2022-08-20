@@ -6,7 +6,7 @@ plugins {
 }
 
 version = "1.6.0+1.19"
-group = "io.github.ashhhleyyy"
+group = "dev.ashhhleyyy"
 
 repositories {
     // needed for placeholder-api
