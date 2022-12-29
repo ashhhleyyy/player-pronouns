@@ -1,12 +1,12 @@
 [versions]
-minecraft = "1.19"
-yarn = "1.19+build.4"
+minecraft = "1.19.3"
+yarn = "1.19.3+build.5"
 
-fabric-loader = "0.14.8"
-fabric-api = "0.56.0+1.19"
+fabric-loader = "0.14.11"
+fabric-api = "0.69.1+1.19.3"
 
-placeholder-api = "2.0.0-beta.7+1.19"
-more-codecs = "0.2.2+1.18"
+placeholder-api = "2.0.0-pre.2+1.19.3"
+more-codecs = "0.3.0+1.19.3"
 
 fabric-permissions = "0.1-SNAPSHOT"
 

@@ -19,10 +19,10 @@
     ]
   },
   "depends": {
-    "fabricloader": ">=0.14.8",
+    "fabricloader": ">=0.14.11",
     "fabric": "*",
-    "minecraft": ">=1.19",
-    "more_codecs": ">=0.2.2",
+    "minecraft": ">=1.19.3",
+    "more_codecs": ">=0.3.0",
     "placeholder-api": ">=2.0.0-beta",
     "fabric-permissions-api-v0": "*"
   }
