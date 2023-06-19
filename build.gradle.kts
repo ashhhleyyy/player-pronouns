@@ -34,10 +34,6 @@ dependencies {
     modImplementation(libs.placeholder.api)
     include(libs.placeholder.api)
 
-    // more-codecs
-    modImplementation(libs.more.codecs)
-    include(libs.more.codecs)
-
     // fabric-api-permissions
     modImplementation(libs.fabric.permissions)
     include(libs.fabric.permissions)

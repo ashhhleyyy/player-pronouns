@@ -1,12 +1,11 @@
 [versions]
-minecraft = "1.19.3"
-yarn = "1.19.3+build.5"
+minecraft = "1.20.1"
+yarn = "1.20.1+build.2"
 
-fabric-loader = "0.14.11"
-fabric-api = "0.69.1+1.19.3"
+fabric-loader = "0.14.21"
+fabric-api = "0.83.1+1.20.1"
 
-placeholder-api = "2.0.0-pre.2+1.19.3"
-more-codecs = "0.3.0+1.19.3"
+placeholder-api = "2.1.1+1.20"
 
 fabric-permissions = "0.1-SNAPSHOT"
 
@@ -18,6 +17,5 @@ fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-l
 fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
 
 placeholder-api = { module = "eu.pb4:placeholder-api", version.ref = "placeholder-api" }
-more-codecs = { module = "xyz.nucleoid:more-codecs", version.ref = "more-codecs" }
 
 fabric-permissions = { module = "me.lucko:fabric-permissions-api", version.ref = "fabric-permissions" }
