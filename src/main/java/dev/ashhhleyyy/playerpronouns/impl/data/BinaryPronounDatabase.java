@@ -1,9 +1,11 @@
-package io.github.ashisbored.playerpronouns.data;
+package dev.ashhhleyyy.playerpronouns.impl.data;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
+
+import dev.ashhhleyyy.playerpronouns.api.Pronouns;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -12,14 +14,16 @@ import java.util.Map;
 import java.util.UUID;
 
 public class BinaryPronounDatabase {
+    private final Path databasePath;
     private final Object2ObjectMap<UUID, String> data;
 
-    private BinaryPronounDatabase(Object2ObjectMap<UUID, String> data) {
+    private BinaryPronounDatabase(Path databasePath, Object2ObjectMap<UUID, String> data) {
+        this.databasePath = databasePath;
         this.data = data;
     }
 
-    private BinaryPronounDatabase() {
-        this(new Object2ObjectOpenHashMap<>());
+    private BinaryPronounDatabase(Path databasePath) {
+        this(databasePath, new Object2ObjectOpenHashMap<>());
     }
 
     public void put(UUID uuid, @Nullable String pronouns) {
@@ -34,8 +38,8 @@ public class BinaryPronounDatabase {
         return this.data.get(uuid);
     }
 
-    public synchronized void save(Path path) throws IOException {
-        try (OutputStream os = Files.newOutputStream(path);
+    public synchronized void save() throws IOException {
+        try (OutputStream os = Files.newOutputStream(this.databasePath);
              DataOutputStream out = new DataOutputStream(os)) {
 
             out.writeShort(0x4567); // some form of magic, idk
@@ -60,12 +64,12 @@ public class BinaryPronounDatabase {
             }
             pronouns.put(entry.getKey(), new Pronouns(entry.getValue(), formatted, false));
         }
-        return new PalettePronounDatabase(pronouns);
+        return new PalettePronounDatabase(path, pronouns);
     }
 
     public static BinaryPronounDatabase load(Path path) throws IOException {
         if (!Files.exists(path)) {
-            return new BinaryPronounDatabase();
+            return new BinaryPronounDatabase(path);
         }
 
         try (InputStream is = Files.newInputStream(path);
@@ -89,7 +93,7 @@ public class BinaryPronounDatabase {
                 }
             }
 
-            return new BinaryPronounDatabase(data);
+            return new BinaryPronounDatabase(path, data);
         }
     }
 }

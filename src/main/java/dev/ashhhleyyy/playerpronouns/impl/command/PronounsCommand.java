@@ -1,11 +1,14 @@
-package io.github.ashisbored.playerpronouns.command;
+package dev.ashhhleyyy.playerpronouns.impl.command;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import io.github.ashisbored.playerpronouns.PlayerPronouns;
-import io.github.ashisbored.playerpronouns.data.PronounList;
-import io.github.ashisbored.playerpronouns.data.Pronouns;
+
+import dev.ashhhleyyy.playerpronouns.api.Pronouns;
+import dev.ashhhleyyy.playerpronouns.api.PronounsApi;
+import dev.ashhhleyyy.playerpronouns.impl.data.PronounList;
+import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
 import me.lucko.fabric.api.permissions.v0.Permissions;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -14,13 +17,15 @@ import net.minecraft.util.Formatting;
 import java.util.Map;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
-import static io.github.ashisbored.playerpronouns.command.PronounsArgument.pronouns;
+import static dev.ashhhleyyy.playerpronouns.impl.command.PronounsArgument.pronouns;
+import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class PronounsCommand {
     public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("pronouns")
-                .then(pronouns("pronouns")
+                .then(literal("set")
+                    .then(pronouns("pronouns")
                         .executes(ctx -> {
                             ServerPlayerEntity player = ctx.getSource().getPlayer();
                             String pronounsString = getString(ctx, "pronouns");
@@ -38,7 +43,7 @@ public class PronounsCommand {
                                 pronouns = new Pronouns(pronounsString, Text.literal(pronounsString), false);
                             }
 
-                            if (!PlayerPronouns.setPronouns(player, pronouns)) {
+                            if (!PronounsApi.getSetter().setPronouns(player, pronouns)) {
                                 ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
                             } else {
                                 ctx.getSource().sendFeedback(() -> Text.literal("Updated your pronouns to ")
@@ -48,6 +53,7 @@ public class PronounsCommand {
 
                             return Command.SINGLE_SUCCESS;
                         })
+                    )
                 ).then(literal("reload-config")
                         .requires(ctx -> Permissions.check(ctx, "playerpronouns.reload_config", 4))
                         .executes(ctx -> {
@@ -58,7 +64,7 @@ public class PronounsCommand {
                 ).then(literal("unset")
                         .executes(ctx -> {
                             ServerPlayerEntity player = ctx.getSource().getPlayer();
-                            if (!PlayerPronouns.setPronouns(player, null)) {
+                            if (!PronounsApi.getSetter().setPronouns(player, null)) {
                                 ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
                             } else {
                                 ctx.getSource().sendFeedback(() -> Text.literal("Cleared your pronouns!")
@@ -66,6 +72,24 @@ public class PronounsCommand {
                             }
                             return Command.SINGLE_SUCCESS;
                         })
+                ).then(literal("show")
+                    .then(argument("player", EntityArgumentType.player())
+                        .executes(ctx -> {
+                            ServerPlayerEntity player = EntityArgumentType.getPlayer(ctx, "player");
+                            Pronouns pronouns = PronounsApi.getReader().getPronouns(player);
+                            if (pronouns != null) {
+                                ctx.getSource().sendFeedback(() -> Text.literal("")
+                                    .append(player.getDisplayName())
+                                    .append(Text.literal("'s pronouns are ")
+                                    .append(pronouns.formatted())), false);
+                            } else {
+                                ctx.getSource().sendFeedback(() -> Text.literal("")
+                                    .append(player.getDisplayName())
+                                    .append(Text.literal(" has not set any pronouns.")), false);
+                            }
+                            return Command.SINGLE_SUCCESS;
+                        })
+                    )
                 )
         );
     }

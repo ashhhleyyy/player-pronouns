@@ -1,17 +1,23 @@
-package io.github.ashisbored.playerpronouns.data;
+package dev.ashhhleyyy.playerpronouns.api;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.ashisbored.playerpronouns.PlayerPronouns;
+
+import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
 import net.minecraft.text.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * A single pronoun, which consists of the word itself, along with an associated style.
+ * @param pronoun The text of this pronoun
+ * @param style An associated style that is used for display as {@link Text}
+ */
 public record Pronoun(
         String pronoun,
         Style style
@@ -91,6 +97,9 @@ public record Pronoun(
         return ret;
     }
 
+    /**
+     * @return A version of this pronoun formatted as a {@link MutableText}
+     */
     public MutableText toText() {
         return Text.literal(this.pronoun).setStyle(this.style);
     }

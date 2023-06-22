@@ -1,17 +1,12 @@
-package io.github.ashisbored.playerpronouns;
+package dev.ashhhleyyy.playerpronouns.impl;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
-import io.github.ashisbored.playerpronouns.command.PronounsCommand;
-import io.github.ashisbored.playerpronouns.data.PronounDatabase;
-import io.github.ashisbored.playerpronouns.data.PronounList;
-import io.github.ashisbored.playerpronouns.data.Pronouns;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -19,6 +14,12 @@ import net.minecraft.util.WorldSavePath;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import dev.ashhhleyyy.playerpronouns.api.Pronouns;
+import dev.ashhhleyyy.playerpronouns.api.PronounsApi;
+import dev.ashhhleyyy.playerpronouns.impl.command.PronounsCommand;
+import dev.ashhhleyyy.playerpronouns.impl.data.PronounDatabase;
+import dev.ashhhleyyy.playerpronouns.impl.data.PronounList;
 
 import java.io.IOException;
 import java.net.URI;
@@ -31,10 +32,9 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
-public class PlayerPronouns implements ModInitializer {
+public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader, PronounsApi.PronounSetter {
     public static final Logger LOGGER = LoggerFactory.getLogger(PlayerPronouns.class);
     public static final String MOD_ID = "playerpronouns";
     private static final String USER_AGENT = "player-pronouns/1.0 (+https://ashhhleyyy.dev/projects/2021/player-pronouns)";
@@ -63,7 +63,7 @@ public class PlayerPronouns implements ModInitializer {
         put("avoid", "avoid");
     }};
 
-    private static PronounDatabase pronounDatabase;
+    private PronounDatabase pronounDatabase;
     public static Config config;
 
     @Override
@@ -88,7 +88,7 @@ public class PlayerPronouns implements ModInitializer {
         ServerLifecycleEvents.SERVER_STOPPING.register(server -> {
             if (pronounDatabase != null) {
                 try {
-                    savePronounDatabase(server);
+                    pronounDatabase.save();
                 } catch (IOException e) {
                     LOGGER.error("Failed to save pronoun database!", e);
                 }
@@ -139,14 +139,17 @@ public class PlayerPronouns implements ModInitializer {
             PronounsCommand.register(dispatcher);
         });
 
-        Placeholders.register(new Identifier(MOD_ID, "pronouns"), (ctx, argument)->
-                PlayerPronouns.fromContext(ctx, argument, true));
+        Placeholders.register(new Identifier(MOD_ID, "pronouns"), (ctx, argument) ->
+                fromContext(ctx, argument, true));
 
-        Placeholders.register(new Identifier(MOD_ID, "raw_pronouns"), (ctx, argument)->
-                PlayerPronouns.fromContext(ctx, argument, false));
+        Placeholders.register(new Identifier(MOD_ID, "raw_pronouns"), (ctx, argument) ->
+                fromContext(ctx, argument, false));
+
+        PronounsApi.initReader(this);
+        PronounsApi.initSetter(this);
     }
 
-    private static PlaceholderResult fromContext(PlaceholderContext ctx, @Nullable String argument, boolean formatted) {
+    private PlaceholderResult fromContext(PlaceholderContext ctx, @Nullable String argument, boolean formatted) {
         if (!ctx.hasPlayer()) {
             return PlaceholderResult.invalid("missing player");
         }
@@ -172,20 +175,12 @@ public class PlayerPronouns implements ModInitializer {
         PronounList.load(config);
     }
 
-    private static void savePronounDatabase(MinecraftServer server) throws IOException {
-        Path playerData = server.getSavePath(WorldSavePath.PLAYERDATA);
-        if (!Files.exists(playerData)) {
-            Files.createDirectories(playerData);
-        }
-        pronounDatabase.save(playerData.resolve("pronouns.dat"));
-    }
-
-    public static boolean setPronouns(ServerPlayerEntity player, @Nullable Pronouns pronouns) {
+    public boolean setPronouns(UUID playerId, @Nullable Pronouns pronouns) {
         if (pronounDatabase == null) return false;
 
-        pronounDatabase.put(player.getUuid(), pronouns);
+        pronounDatabase.put(playerId, pronouns);
         try {
-            savePronounDatabase(Objects.requireNonNull(player.getServer()));
+            pronounDatabase.save();
         } catch (IOException e) {
             LOGGER.error("Failed to save pronoun database!", e);
         }
@@ -193,11 +188,11 @@ public class PlayerPronouns implements ModInitializer {
         return true;
     }
 
-    public static @Nullable Pronouns getPronouns(ServerPlayerEntity player) {
+    public @Nullable Pronouns getPronouns(ServerPlayerEntity player) {
         return getPronouns(player.getUuid());
     }
 
-    public static @Nullable Pronouns getPronouns(UUID playerId) {
+    public @Nullable Pronouns getPronouns(UUID playerId) {
         if (pronounDatabase == null) return null;
         return pronounDatabase.get(playerId);
     }

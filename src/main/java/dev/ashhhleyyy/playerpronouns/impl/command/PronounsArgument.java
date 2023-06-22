@@ -1,8 +1,9 @@
-package io.github.ashisbored.playerpronouns.command;
+package dev.ashhhleyyy.playerpronouns.impl.command;
 
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
-import io.github.ashisbored.playerpronouns.data.PronounList;
+
+import dev.ashhhleyyy.playerpronouns.impl.data.PronounList;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 

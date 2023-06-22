@@ -1,7 +1,9 @@
-package io.github.ashisbored.playerpronouns.data;
+package dev.ashhhleyyy.playerpronouns.impl.data;
 
-import io.github.ashisbored.playerpronouns.PlayerPronouns;
 import org.jetbrains.annotations.Nullable;
+
+import dev.ashhhleyyy.playerpronouns.api.Pronouns;
+import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -13,7 +15,7 @@ import java.util.UUID;
 public interface PronounDatabase {
     void put(UUID player, @Nullable Pronouns pronouns);
     @Nullable Pronouns get(UUID player);
-    void save(Path path) throws IOException;
+    void save() throws IOException;
 
     static PronounDatabase load(Path path) throws IOException {
         if (!Files.exists(path)) {

@@ -1,8 +1,10 @@
-package io.github.ashisbored.playerpronouns.data;
+package dev.ashhhleyyy.playerpronouns.impl.data;
 
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
-import io.github.ashisbored.playerpronouns.PlayerPronouns;
+
+import dev.ashhhleyyy.playerpronouns.api.Pronouns;
+import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -19,20 +21,22 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * An improved version of {@link io.github.ashisbored.playerpronouns.data.BinaryPronounDatabase} that uses a palette
+ * An improved version of {@link dev.ashhhleyyy.playerpronouns.data.BinaryPronounDatabase} that uses a palette
  * for efficiency when storing lots of players. It also supports versioning of the file to allow for changes to be
  * made to the format in the future.
  */
 public class PalettePronounDatabase implements PronounDatabase {
     public static final int VERSION_NUMBER = 1;
+    private final Path databasePath;
     private final Object2ObjectMap<UUID, Pronouns> data;
 
-    protected PalettePronounDatabase(Object2ObjectMap<UUID, Pronouns> data) {
+    protected PalettePronounDatabase(Path databasePath, Object2ObjectMap<UUID, Pronouns> data) {
+        this.databasePath = databasePath;
         this.data = data;
     }
 
-    private PalettePronounDatabase() {
-        this(new Object2ObjectOpenHashMap<>());
+    private PalettePronounDatabase(Path databasePath) {
+        this(databasePath, new Object2ObjectOpenHashMap<>());
     }
 
     @Override
@@ -50,8 +54,8 @@ public class PalettePronounDatabase implements PronounDatabase {
     }
 
     @Override
-    public synchronized void save(Path path) throws IOException {
-        try (OutputStream os = Files.newOutputStream(path);
+    public synchronized void save() throws IOException {
+        try (OutputStream os = Files.newOutputStream(this.databasePath);
              DataOutputStream out = new DataOutputStream(os)) {
 
             out.writeShort(0x4568);
@@ -90,7 +94,7 @@ public class PalettePronounDatabase implements PronounDatabase {
 
     public static PalettePronounDatabase load(Path path) throws IOException {
         if (!Files.exists(path)) {
-            return new PalettePronounDatabase();
+            return new PalettePronounDatabase(path);
         }
 
         try (InputStream is = Files.newInputStream(path);
@@ -136,7 +140,7 @@ public class PalettePronounDatabase implements PronounDatabase {
                 }
             }
 
-            return new PalettePronounDatabase(data);
+            return new PalettePronounDatabase(path, data);
         }
     }
 }

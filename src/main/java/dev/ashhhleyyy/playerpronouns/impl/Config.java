@@ -1,4 +1,4 @@
-package io.github.ashisbored.playerpronouns;
+package dev.ashhhleyyy.playerpronouns.impl;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -8,7 +8,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.github.ashisbored.playerpronouns.data.Pronoun;
+
+import dev.ashhhleyyy.playerpronouns.api.Pronoun;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;

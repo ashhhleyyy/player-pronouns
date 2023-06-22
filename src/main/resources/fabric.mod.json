@@ -9,13 +9,14 @@
   ],
   "contact": {
     "sources": "https://github.com/ashhhleyyy/player-pronouns",
-    "issues": "https://github.com/ashhhleyyy/player-pronouns/issues"
+    "issues": "https://github.com/ashhhleyyy/player-pronouns/issues",
+    "homepage": "https://ashhhleyyy.dev/projects/2021/player-pronouns"
   },
   "license": "MIT",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "io.github.ashisbored.playerpronouns.PlayerPronouns"
+      "dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns"
     ]
   },
   "depends": {

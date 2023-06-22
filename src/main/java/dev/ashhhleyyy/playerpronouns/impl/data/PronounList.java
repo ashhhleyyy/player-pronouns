@@ -1,10 +1,12 @@
-package io.github.ashisbored.playerpronouns.data;
+package dev.ashhhleyyy.playerpronouns.impl.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import io.github.ashisbored.playerpronouns.Config;
-import io.github.ashisbored.playerpronouns.PlayerPronouns;
+
+import dev.ashhhleyyy.playerpronouns.api.Pronoun;
+import dev.ashhhleyyy.playerpronouns.impl.Config;
+import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
