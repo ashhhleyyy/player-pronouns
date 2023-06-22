@@ -5,7 +5,7 @@ plugins {
     `maven-publish`
 }
 
-version = "1.6.0+1.19"
+version = "1.6.0+1.20.1"
 group = "dev.ashhhleyyy"
 
 repositories {
@@ -33,10 +33,6 @@ dependencies {
     // placeholder-api
     modImplementation(libs.placeholder.api)
     include(libs.placeholder.api)
-
-    // more-codecs
-    modImplementation(libs.more.codecs)
-    include(libs.more.codecs)
 
     // fabric-api-permissions
     modImplementation(libs.fabric.permissions)

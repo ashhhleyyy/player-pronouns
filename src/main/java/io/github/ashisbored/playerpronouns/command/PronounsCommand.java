@@ -41,7 +41,7 @@ public class PronounsCommand {
                             if (!PlayerPronouns.setPronouns(player, pronouns)) {
                                 ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
                             } else {
-                                ctx.getSource().sendFeedback(Text.literal("Updated your pronouns to ")
+                                ctx.getSource().sendFeedback(() -> Text.literal("Updated your pronouns to ")
                                         .append(pronouns.formatted())
                                         .formatted(Formatting.GREEN), false);
                             }
@@ -52,7 +52,7 @@ public class PronounsCommand {
                         .requires(ctx -> Permissions.check(ctx, "playerpronouns.reload_config", 4))
                         .executes(ctx -> {
                             PlayerPronouns.reloadConfig();
-                            ctx.getSource().sendFeedback(Text.literal("Reloaded the config!").formatted(Formatting.GREEN), true);
+                            ctx.getSource().sendFeedback(() -> Text.literal("Reloaded the config!").formatted(Formatting.GREEN), true);
                             return Command.SINGLE_SUCCESS;
                         })
                 ).then(literal("unset")
@@ -61,7 +61,7 @@ public class PronounsCommand {
                             if (!PlayerPronouns.setPronouns(player, null)) {
                                 ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
                             } else {
-                                ctx.getSource().sendFeedback(Text.literal("Cleared your pronouns!")
+                                ctx.getSource().sendFeedback(() -> Text.literal("Cleared your pronouns!")
                                         .formatted(Formatting.GREEN), false);
                             }
                             return Command.SINGLE_SUCCESS;
