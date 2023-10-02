@@ -40,27 +40,15 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
     private static final String USER_AGENT = "player-pronouns/1.0 (+https://ashhhleyyy.dev/projects/2021/player-pronouns)";
 
     private static final Map<String, String> PRONOUNDB_ID_MAP = new HashMap<>() {{
-        // short pronoun set identifier map from https://pronoundb.org/docs
-        put("hh", "he/him");
-        put("hi", "he/it");
-        put("hs", "he/she");
-        put("ht", "he/they");
-        put("ih", "it/he");
-        put("ii", "it/its");
-        put("is", "it/she");
-        put("it", "it/they");
-        put("shh", "she/he");
-        put("sh", "she/her");
-        put("si", "she/it");
-        put("st", "she/they");
-        put("th", "they/he");
-        put("ti", "they/it");
-        put("ts", "they/she");
-        put("tt", "they/them");
+        // short pronoun set identifier map from https://pronoundb.org/wiki/api-docs
+        put("he", "he/him");
+        put("it", "it/its");
+        put("she", "she/her");
+        put("they", "they/them");
         put("any", "any");
-        put("other", "other");
         put("ask", "ask");
         put("avoid", "avoid");
+        put("other", "other");
     }};
 
     private PronounDatabase pronounDatabase;
@@ -101,7 +89,7 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
                 var currentPronouns = pronounDatabase.get(handler.getPlayer().getUuid());
                 if (currentPronouns != null && !currentPronouns.remote()) return;
 
-                var pronounDbUrl = "https://pronoundb.org/api/v1/lookup?platform=minecraft&id=%s"
+                var pronounDbUrl = "https://pronoundb.org/api/v2/lookup?platform=minecraft&ids=%s"
                                             .formatted(handler.getPlayer().getUuid());
                 try {
                     var client = HttpClient.newBuilder()
@@ -122,10 +110,21 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
                                 if (currentPronouns2 != null && !currentPronouns2.remote()) return;
 
                                 var json = JsonHelper.deserialize(body);
-                                var pronounsResponse = json.get("pronouns").getAsString();
-                                if (!"unspecified".equals(pronounsResponse)) {
-                                    var pronouns = PRONOUNDB_ID_MAP.getOrDefault(pronounsResponse, "ask");
-                                    setPronouns(handler.getPlayer(), new Pronouns(pronouns, PronounList.get().getCalculatedPronounStrings().get(pronouns), true));
+                                StringBuilder pronouns = new StringBuilder("unspecified");
+                                if (json.has(handler.getPlayer().getUuid().toString()) && json.getAsJsonObject(handler.getPlayer().getUuid().toString()).getAsJsonObject("sets").has("en")) {
+                                    var pronounsList = json.getAsJsonObject(handler.getPlayer().getUuid().toString()).getAsJsonObject("sets").getAsJsonArray("en");
+                                    if (pronounsList.size() == 1) {
+                                        pronouns = new StringBuilder(PRONOUNDB_ID_MAP.get(pronounsList.get(0).getAsString()));
+                                    } else {
+                                        pronouns = new StringBuilder();
+                                        for (var prounoun: pronounsList) {
+                                            pronouns.append(prounoun.getAsString()).append("/");
+                                        }
+                                        pronouns = new StringBuilder(pronouns.substring(0, pronouns.length() - 1)); // remove trailing slash
+                                    }
+                                }
+                                if (!"unspecified".contentEquals(pronouns)) {
+                                    setPronouns(handler.getPlayer(), new Pronouns(pronouns.toString(), PronounList.get().getCalculatedPronounStrings().get(pronouns.toString()), true));
                                 }
                             }, server);
                 } catch (URISyntaxException e) {
