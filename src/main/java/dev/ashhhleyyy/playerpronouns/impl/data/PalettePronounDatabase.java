@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * An improved version of {@link dev.ashhhleyyy.playerpronouns.data.BinaryPronounDatabase} that uses a palette
+ * An improved version of {@link dev.ashhhleyyy.playerpronouns.impl.data.BinaryPronounDatabase} that uses a palette
  * for efficiency when storing lots of players. It also supports versioning of the file to allow for changes to be
  * made to the format in the future.
  */

@@ -52,7 +52,7 @@ public final class PronounsApi {
      * 
      * This should not be called by most mods, unless they are implementing a custom backend.
      * 
-     * @param reader The reader to configure
+     * @param setter The setter to configure
      */
     public static void initSetter(PronounSetter setter) {
         if (SETTER != null) {
