@@ -9,12 +9,11 @@ pluginManagement {
 						url = uri("https://server.bbkr.space/artifactory/libs-release")
 				}
 				gradlePluginPortal()
+				mavenCentral()
 		}
 }
 
 rootProject.name = "player-pronouns"
-
-enableFeaturePreview("VERSION_CATALOGS")
 
 dependencyResolutionManagement {
 		versionCatalogs {

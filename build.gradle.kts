@@ -1,11 +1,10 @@
 plugins {
-    id("fabric-loom") version "0.12.+"
-    id("io.github.juuxel.loom-quiltflower") version "1.7.+"
+    id("fabric-loom") version "1.5.+"
     id("com.modrinth.minotaur") version "2.+"
     `maven-publish`
 }
 
-version = "2.0.0+1.20.1"
+version = "2.0.0+1.20.4"
 group = "dev.ashhhleyyy"
 
 repositories {

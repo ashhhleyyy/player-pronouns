@@ -3,7 +3,7 @@ package dev.ashhhleyyy.playerpronouns.api;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.text.Text;
-import net.minecraft.util.dynamic.Codecs;
+import net.minecraft.text.TextCodecs;
 
 /**
  * A combined set of {@link Pronoun}s
@@ -18,7 +18,7 @@ public record Pronouns(
 ) {
     public static final Codec<Pronouns> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("raw").forGetter(Pronouns::raw),
-            Codecs.TEXT.fieldOf("formatted").forGetter(Pronouns::formatted),
+            TextCodecs.CODEC.fieldOf("formatted").forGetter(Pronouns::formatted),
             Codec.BOOL.optionalFieldOf("remote", false).forGetter(Pronouns::remote)
     ).apply(instance, Pronouns::new));
 }

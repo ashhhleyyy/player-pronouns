@@ -60,7 +60,7 @@ public record Pronoun(
                 case "underline" -> style = style.withUnderline(true);
                 case "obfuscated" -> style = style.withObfuscated(true);
                 default -> {
-                    TextColor col = TextColor.parse(format);
+                    TextColor col = TextColor.parse(format).result().orElse(null);
                     if (col != null) {
                         style = style.withColor(col);
                     } else {
