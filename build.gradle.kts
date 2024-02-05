@@ -4,7 +4,7 @@ plugins {
     `maven-publish`
 }
 
-version = "2.0.0+1.20.4"
+version = "2.1.0+1.20.4"
 group = "dev.ashhhleyyy"
 
 repositories {
