@@ -1,13 +1,13 @@
 package dev.ashhhleyyy.playerpronouns.impl.interop;
 
-import dev.ashhhleyyy.playerpronouns.api.ExtraPronounProvider;
+import dev.ashhhleyyy.playerpronouns.api.Pronouns;
+import dev.ashhhleyyy.playerpronouns.api.PronounsApi;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -18,10 +18,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 
-public class PronounDbClient implements ExtraPronounProvider {
+public class PronounDbClient implements PronounsApi.PronounReader {
     private static final Logger LOGGER = LoggerFactory.getLogger(PronounDbClient.class);
+    private static final Map<UUID, Pronouns> UUID_TO_PRONOUNS = new HashMap<>();
     private static final Map<String, String> PRONOUNDB_ID_MAP = new HashMap<>() {{
         // short pronoun set identifier map from https://pronoundb.org/wiki/api-docs
         put("he", "he/him");
@@ -44,7 +44,10 @@ public class PronounDbClient implements ExtraPronounProvider {
     }
 
     @Override
-    public CompletableFuture<Optional<String>> provideExtras(UUID playerId) {
+    public Optional<Pronouns> getPronouns(UUID playerId) {
+        if (UUID_TO_PRONOUNS.containsKey(playerId)) {
+            return Optional.of(UUID_TO_PRONOUNS.get(playerId));
+        }
         try {
             URI url = new URI("https://pronoundb.org/api/v2/lookup?platform=minecraft&ids=" + playerId);
             var req = HttpRequest.newBuilder(url)
@@ -54,15 +57,12 @@ public class PronounDbClient implements ExtraPronounProvider {
                     .build();
             // Random intermediate variable to force type inference
             // (otherwise it becomes an Optional<? extends Object>)
-            CompletableFuture<Optional<String>> completableFuture = client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
-                    .thenApply(resp -> {
-                        if (resp.statusCode() != 200) {
-                            return Optional.empty();
-                        }
-                        return Optional.of(resp.body());
-                    });
-            return completableFuture.thenApply(b -> b.flatMap(body -> {
-                var json = JsonHelper.deserialize(body);
+            try {
+                HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
+                if (response.statusCode() != 200) {
+                    return Optional.empty();
+                }
+                var json = JsonHelper.deserialize(response.body());
                 String player = playerId.toString();
                 if (json.has(player) && json.getAsJsonObject(player).getAsJsonObject("sets").has("en")) {
                     var pronounList = json.getAsJsonObject(player).getAsJsonObject("sets").getAsJsonArray("en");
@@ -83,30 +83,20 @@ public class PronounDbClient implements ExtraPronounProvider {
                     if ("unspecified".equals(pronouns)) {
                         return Optional.empty();
                     } else {
-                        return Optional.of(pronouns);
+                        Pronouns result = Pronouns.fromString(pronouns, PlayerPronouns.identifier("pronoundb"));
+                        UUID_TO_PRONOUNS.put(playerId, result);
+                        return Optional.of(result);
                     }
                 } else {
                     LOGGER.error("malformed response from pronoundb");
                     return Optional.empty();
                 }
-            }));
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
-    public Identifier getId() {
-        return PlayerPronouns.identifier("pronoundb.org");
-    }
-
-    @Override
-    public Text getName() {
-        return Text.literal("PronounDB");
-    }
-
-    @Override
-    public boolean enabled() {
-        return PlayerPronouns.config.integrations().pronounDB();
-    }
 }

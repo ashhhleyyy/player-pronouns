@@ -3,6 +3,7 @@ package dev.ashhhleyyy.playerpronouns.impl.data;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 import dev.ashhhleyyy.playerpronouns.api.Pronouns;
+import dev.ashhhleyyy.playerpronouns.api.PronounsApi;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -39,6 +40,32 @@ public class PalettePronounDatabase implements PronounDatabase {
     }
 
     public static PalettePronounDatabase load(Path path) throws IOException {
+        if (!Files.exists(path)) {
+            // Will create a new empty database.
+            return initialize(path);
+        }
+
+        boolean legacy = false;
+        try (InputStream is = Files.newInputStream(path);
+             DataInputStream in = new DataInputStream(is)) {
+            short magic = in.readShort();
+            if (magic == 0x4567) {
+                legacy = true;
+            }
+        }
+
+        if (legacy) {
+            PlayerPronouns.LOGGER.info("Old (1.0.0) format pronoun database found, converting...");
+            Path backupPath = path.getParent().resolve(path.getFileName().toString() + ".bak");
+            Files.copy(path, backupPath);
+            PlayerPronouns.LOGGER.info("Old database backed up to {}", backupPath);
+            return BinaryPronounDatabase.convert(path);
+        }
+
+        return initialize(path);
+    }
+
+    private static PalettePronounDatabase initialize(Path path) throws IOException {
         if (!Files.exists(path)) {
             return new PalettePronounDatabase(path);
         }
@@ -91,17 +118,24 @@ public class PalettePronounDatabase implements PronounDatabase {
     }
 
     @Override
-    public void put(UUID player, @Nullable Pronouns pronouns) {
+    public boolean setPronouns(UUID player, @Nullable Pronouns pronouns) {
         if (pronouns == null) {
-            this.data.remove(player);
+            data.remove(player);
         } else {
-            this.data.put(player, pronouns);
+            data.put(player, pronouns);
+        }
+        try {
+            save();
+            return true;
+        } catch (Throwable e) {
+            PlayerPronouns.LOGGER.error("Failed to save pronoun database!", e);
+            return false;
         }
     }
 
     @Override
-    public @Nullable Pronouns get(UUID player) {
-        return this.data.get(player);
+    public Optional<Pronouns> getPronouns(UUID player) {
+        return Optional.ofNullable(this.data.get(player));
     }
 
     @Override
