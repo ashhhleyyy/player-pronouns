@@ -1,17 +1,17 @@
 plugins {
-    id("fabric-loom") version "1.7-SNAPSHOT"
+    id("fabric-loom") version "1.11-SNAPSHOT"
     id("com.modrinth.minotaur") version "2.+"
     `maven-publish`
 }
 
-version = "2.3.0+1.21.4"
+version = "2.4.0+1.21.6"
 group = "dev.ashhhleyyy"
 
 repositories {
     // needed for placeholder-api
     maven {
         name = "NucleoidMC"
-        url = uri("https://maven.nucleoid.xyz/")
+        url = uri("https://maven.nucleoid.xyz/releases/")
     }
     // permissions api
     maven {
