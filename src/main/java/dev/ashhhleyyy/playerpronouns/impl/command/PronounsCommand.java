@@ -14,6 +14,7 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static dev.ashhhleyyy.playerpronouns.impl.command.PronounsArgument.pronouns;
@@ -21,7 +22,7 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
 public class PronounsCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+    public void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(literal("pronouns")
                 .then(literal("set")
                         .then(pronouns("pronouns")
@@ -42,14 +43,14 @@ public class PronounsCommand {
                                         return 0;
                                     }
 
-                                    Pronouns pronouns = Pronouns.fromString(pronounsString);
+                                    Pronouns pronouns = Pronouns.fromString(pronounsString, PlayerPronouns.identifier("command"));
 
-                                    if (!PronounsApi.getSetter().setPronouns(player, pronouns)) {
-                                        ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
-                                    } else {
+                                    if (PronounsApi.setPronouns(player, pronouns)) {
                                         ctx.getSource().sendFeedback(() -> Text.literal("Updated your pronouns to ")
                                                 .append(pronouns.formatted())
                                                 .formatted(Formatting.GREEN), false);
+                                    } else {
+                                        ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
                                     }
 
                                     return Command.SINGLE_SUCCESS;
@@ -65,11 +66,11 @@ public class PronounsCommand {
                 ).then(literal("unset")
                         .executes(ctx -> {
                             ServerPlayerEntity player = ctx.getSource().getPlayerOrThrow();
-                            if (!PronounsApi.getSetter().setPronouns(player, null)) {
-                                ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
-                            } else {
+                            if (PronounsApi.setPronouns(player, null)) {
                                 ctx.getSource().sendFeedback(() -> Text.literal("Cleared your pronouns!")
                                         .formatted(Formatting.GREEN), false);
+                            } else {
+                                ctx.getSource().sendError(Text.literal("Failed to update pronouns, sorry"));
                             }
                             return Command.SINGLE_SUCCESS;
                         })
@@ -77,12 +78,12 @@ public class PronounsCommand {
                         .then(argument("player", EntityArgumentType.player())
                                 .executes(ctx -> {
                                     ServerPlayerEntity player = EntityArgumentType.getPlayer(ctx, "player");
-                                    Pronouns pronouns = PronounsApi.getReader().getPronouns(player);
-                                    if (pronouns != null) {
+                                    Optional<Pronouns> pronouns = PronounsApi.getPronouns(player);
+                                    if (pronouns.isPresent()) {
                                         ctx.getSource().sendFeedback(() -> Text.literal("")
                                                 .append(player.getDisplayName())
                                                 .append(Text.literal("'s pronouns are ")
-                                                        .append(pronouns.formatted())), false);
+                                                        .append(pronouns.get().formatted())), false);
                                     } else {
                                         ctx.getSource().sendFeedback(() -> Text.literal("")
                                                 .append(player.getDisplayName())
@@ -94,4 +95,5 @@ public class PronounsCommand {
                 )
         );
     }
+
 }

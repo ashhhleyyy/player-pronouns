@@ -3,73 +3,45 @@ package dev.ashhhleyyy.playerpronouns.api;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
- * Entrypoint to the API, and provides access to a {@link PronounReader} and {@link PronounSetter}
+ * Entrypoint to the API, and provides access to a {@link PronounReader} and {@link ProunounWriter}
  */
 public final class PronounsApi {
-    private static final List<ExtraPronounProvider> PROVIDERS = new ArrayList<>();
-    private static @Nullable PronounReader READER = null;
-    private static @Nullable PronounSetter SETTER = null;
+    private static final List<PronounReader> READERS = new ArrayList<>();
+    private static final List<ProunounWriter> WRITERS = new ArrayList<>();
 
-    /**
-     * @return The currently initialised {@link PronounReader}
-     */
-    public static PronounReader getReader() {
-        if (READER == null) {
-            throw new IllegalStateException("PronounReader has not been initialised");
+    public static void registerReader(PronounReader reader) {
+        READERS.add(reader);
+    }
+
+    public static void registerWriter(ProunounWriter writer) {
+        WRITERS.add(writer);
+    }
+
+    public static Optional<Pronouns> getPronouns(UUID playerId) {
+        for (PronounReader reader : READERS) {
+            Optional<Pronouns> pronouns = reader.getPronouns(playerId);
+            if (pronouns.isPresent()) return pronouns;
         }
-        return READER;
+        return Optional.empty();
     }
 
-    /**
-     * @return The currently initialised {@link PronounSetter}
-     */
-    public static PronounSetter getSetter() {
-        if (SETTER == null) {
-            throw new IllegalStateException("PronounSetter has not been initialised");
+    public static Optional<Pronouns> getPronouns(ServerPlayerEntity player) {
+        return getPronouns(player.getUuid());
+    }
+
+    public static boolean setPronouns(UUID playerID, @Nullable Pronouns pronouns) {
+        for (ProunounWriter writer : WRITERS) {
+            boolean result = writer.setPronouns(playerID, pronouns);
+            if (result && pronouns != null) return true;
         }
-        return SETTER;
+        return pronouns == null;
     }
 
-    /**
-     * Makes the passed reader be set as the default.
-     * <p>
-     * This should not be called by most mods, unless they are implementing a custom backend.
-     *
-     * @param reader The reader to configure
-     */
-    public static void initReader(PronounReader reader) {
-        if (READER != null) {
-            throw new IllegalStateException("PronounReader has already been initialised");
-        }
-        READER = reader;
-    }
-
-    /**
-     * Makes the passed setter be set as the default.
-     * <p.
-     * This should not be called by most mods, unless they are implementing a custom backend.
-     *
-     * @param setter The setter to configure
-     */
-    public static void initSetter(PronounSetter setter) {
-        if (SETTER != null) {
-            throw new IllegalStateException("PronounSetter has already been initialised");
-        }
-        SETTER = setter;
-    }
-
-    public static void registerPronounProvider(ExtraPronounProvider provider) {
-        PROVIDERS.add(provider);
-    }
-
-    public static List<ExtraPronounProvider> getExtraPronounProviders() {
-        return Collections.unmodifiableList(PROVIDERS);
+    public static boolean setPronouns(ServerPlayerEntity player, @Nullable Pronouns pronouns) {
+        return setPronouns(player.getUuid(), pronouns);
     }
 
     /**
@@ -77,10 +49,7 @@ public final class PronounsApi {
      * <p>
      * Methods in this class may invoke blocking IO operations to save the database to disk.
      */
-    public interface PronounSetter {
-        default boolean setPronouns(ServerPlayerEntity player, @Nullable Pronouns pronouns) {
-            return this.setPronouns(player.getUuid(), pronouns);
-        }
+    public interface ProunounWriter {
 
         boolean setPronouns(UUID playerId, @Nullable Pronouns pronouns);
     }
@@ -89,10 +58,7 @@ public final class PronounsApi {
      * Allows obtaining a player's {@link Pronouns}
      */
     public interface PronounReader {
-        default @Nullable Pronouns getPronouns(ServerPlayerEntity player) {
-            return this.getPronouns(player.getUuid());
-        }
 
-        @Nullable Pronouns getPronouns(UUID playerId);
+        Optional<Pronouns> getPronouns(UUID playerId);
     }
 }
