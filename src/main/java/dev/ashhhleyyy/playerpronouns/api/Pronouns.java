@@ -3,12 +3,12 @@ package dev.ashhhleyyy.playerpronouns.api;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.ashhhleyyy.playerpronouns.impl.data.PronounList;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A combined set of {@link Pronoun}s
@@ -20,32 +20,32 @@ import java.util.Optional;
  */
 public record Pronouns(
         String raw,
-        Text formatted,
+        Component formatted,
         boolean remote,
-        @Nullable Identifier provider
+        @Nullable ResourceLocation provider
 ) {
     public static final Codec<Pronouns> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("raw").forGetter(Pronouns::raw),
-            TextCodecs.CODEC.fieldOf("formatted").forGetter(Pronouns::formatted),
+            ComponentSerialization.CODEC.fieldOf("formatted").forGetter(Pronouns::formatted),
             Codec.BOOL.optionalFieldOf("remote", false).forGetter(Pronouns::remote),
-            Identifier.CODEC.optionalFieldOf("provider").forGetter(pronouns -> Optional.ofNullable(pronouns.provider()))
+            ResourceLocation.CODEC.optionalFieldOf("provider").forGetter(pronouns -> Optional.ofNullable(pronouns.provider()))
     ).apply(instance, Pronouns::new));
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType") // lol, lmao
-    private Pronouns(String raw, Text formatted, boolean remote, Optional<Identifier> provider) {
+    private Pronouns(String raw, Component formatted, boolean remote, Optional<ResourceLocation> provider) {
         this(raw, formatted, remote, provider.orElse(null));
     }
 
-    private Pronouns(String raw, Text formatted) {
-        this(raw, formatted, false, (Identifier) null);
+    private Pronouns(String raw, Component formatted) {
+        this(raw, formatted, false, (ResourceLocation) null);
     }
 
     public static Pronouns fromString(String pronouns) {
         return Pronouns.fromString(pronouns, false, null);
     }
 
-    public static Pronouns fromString(String pronouns, boolean remote, @Nullable Identifier provider) {
-        Text formatted = PronounList.get().getCalculatedPronounStrings().getOrDefault(pronouns, Text.literal(pronouns));
+    public static Pronouns fromString(String pronouns, boolean remote, @Nullable ResourceLocation provider) {
+        Component formatted = PronounList.get().getCalculatedPronounStrings().getOrDefault(pronouns, Component.literal(pronouns));
         return new Pronouns(pronouns, formatted, remote, provider);
     }
 }

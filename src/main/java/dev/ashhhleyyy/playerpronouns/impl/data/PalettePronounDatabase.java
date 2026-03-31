@@ -8,7 +8,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import net.minecraft.util.Tuple;
 
 /**
  * An improved version of {@link dev.ashhhleyyy.playerpronouns.impl.data.BinaryPronounDatabase} that uses a palette
@@ -112,9 +112,9 @@ public class PalettePronounDatabase implements PronounDatabase {
             out.writeShort(0x4568);
             out.writeInt(VERSION_NUMBER);
 
-            Pair<List<Pronouns>, Object2IntMap<UUID>> pair = this.convertToPalette();
-            List<Pronouns> palette = pair.getLeft();
-            Object2IntMap<UUID> values = pair.getRight();
+            Tuple<List<Pronouns>, Object2IntMap<UUID>> pair = this.convertToPalette();
+            List<Pronouns> palette = pair.getA();
+            Object2IntMap<UUID> values = pair.getB();
 
             out.writeInt(palette.size());
             for (Pronouns pronouns : palette) {
@@ -131,7 +131,7 @@ public class PalettePronounDatabase implements PronounDatabase {
         }
     }
 
-    private Pair<List<Pronouns>, Object2IntMap<UUID>> convertToPalette() {
+    private Tuple<List<Pronouns>, Object2IntMap<UUID>> convertToPalette() {
         List<Pronouns> palette = new ArrayList<>();
         Object2IntMap<UUID> values = new Object2IntOpenHashMap<>();
         for (var entry : this.data.entrySet()) {
@@ -140,6 +140,6 @@ public class PalettePronounDatabase implements PronounDatabase {
             }
             values.put(entry.getKey(), palette.indexOf(entry.getValue()));
         }
-        return new Pair<>(palette, values);
+        return new Tuple<>(palette, values);
     }
 }

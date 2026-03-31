@@ -6,15 +6,14 @@ import com.google.gson.JsonParser;
 import dev.ashhhleyyy.playerpronouns.api.Pronoun;
 import dev.ashhhleyyy.playerpronouns.impl.Config;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.Pair;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.Tuple;
 
 public class PronounList {
     private static PronounList INSTANCE;
@@ -23,7 +22,7 @@ public class PronounList {
     private final List<Pronoun> defaultPairs;
     private final List<Pronoun> customSingle;
     private final List<Pronoun> customPairs;
-    private final Map<String, Text> calculatedPronounStrings;
+    private final Map<String, Component> calculatedPronounStrings;
 
     public PronounList(List<Pronoun> defaultSingle, List<Pronoun> defaultPairs, List<Pronoun> customSingle, List<Pronoun> customPairs) {
         this.defaultSingle = defaultSingle;
@@ -39,10 +38,10 @@ public class PronounList {
             return;
         }
 
-        Pair<List<Pronoun>, List<Pronoun>> defaults = loadDefaults();
+        Tuple<List<Pronoun>, List<Pronoun>> defaults = loadDefaults();
         INSTANCE = new PronounList(
-                defaults.getLeft(),
-                defaults.getRight(),
+                defaults.getA(),
+                defaults.getB(),
                 config.getSingle(),
                 config.getPairs()
         );
@@ -55,7 +54,7 @@ public class PronounList {
         return INSTANCE;
     }
 
-    private static Pair<List<Pronoun>, List<Pronoun>> loadDefaults() {
+    private static Tuple<List<Pronoun>, List<Pronoun>> loadDefaults() {
         try (InputStream is = Objects.requireNonNull(PronounList.class.getResourceAsStream("/default_pronouns.json"));
              InputStreamReader reader = new InputStreamReader(is)) {
             JsonObject ele = JsonParser.parseReader(reader).getAsJsonObject();
@@ -65,19 +64,19 @@ public class PronounList {
             List<Pronoun> pairs = new ArrayList<>();
             jsonSingle.forEach(e -> single.add(new Pronoun(e.getAsString(), Style.EMPTY)));
             jsonPairs.forEach(e -> pairs.add(new Pronoun(e.getAsString(), Style.EMPTY)));
-            return new Pair<>(single, pairs);
+            return new Tuple<>(single, pairs);
         } catch (IOException e) {
             PlayerPronouns.LOGGER.error("Failed to load default pronouns!", e);
-            return new Pair<>(Collections.emptyList(), Collections.emptyList());
+            return new Tuple<>(Collections.emptyList(), Collections.emptyList());
         }
     }
 
-    public Map<String, Text> getCalculatedPronounStrings() {
+    public Map<String, Component> getCalculatedPronounStrings() {
         return this.calculatedPronounStrings;
     }
 
-    private Map<String, Text> computePossibleCombinations() {
-        Map<String, Text> ret = new HashMap<>();
+    private Map<String, Component> computePossibleCombinations() {
+        Map<String, Component> ret = new HashMap<>();
         for (Pronoun pronoun : this.defaultSingle) {
             ret.put(pronoun.pronoun(), pronoun.toText());
         }
@@ -92,9 +91,9 @@ public class PronounList {
                 if (i == j) continue;
                 Pronoun a = combinedPairs.get(i);
                 Pronoun b = combinedPairs.get(j);
-                MutableText combined = Text.literal("");
+                MutableComponent combined = Component.literal("");
                 combined.append(a.toText());
-                combined.append(Text.literal("/"));
+                combined.append(Component.literal("/"));
                 combined.append(b.toText());
                 ret.put(a.pronoun() + "/" + b.pronoun(), combined);
             }

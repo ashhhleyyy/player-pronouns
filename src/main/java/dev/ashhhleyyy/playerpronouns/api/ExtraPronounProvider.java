@@ -1,11 +1,10 @@
 package dev.ashhhleyyy.playerpronouns.api;
 
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * A provider that can add extra pronouns for a user based on remote data.
@@ -13,9 +12,9 @@ import java.util.concurrent.CompletableFuture;
 public interface ExtraPronounProvider {
     CompletableFuture<Optional<String>> provideExtras(UUID playerId);
 
-    Identifier getId();
+    ResourceLocation getId();
 
-    Text getName();
+    Component getName();
 
     boolean enabled();
 }

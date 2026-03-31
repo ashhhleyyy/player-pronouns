@@ -6,20 +6,19 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 
 /**
  * A single pronoun, which consists of the word itself, along with an associated style.
  *
  * @param pronoun The text of this pronoun
- * @param style   An associated style that is used for display as {@link Text}
+ * @param style   An associated style that is used for display as {@link Component}
  */
 public record Pronoun(
         String pronoun,
@@ -35,10 +34,10 @@ public record Pronoun(
                 case "bold" -> style = style.withBold(true);
                 case "italic" -> style = style.withItalic(true);
                 case "strikethrough" -> style = style.withStrikethrough(true);
-                case "underline" -> style = style.withUnderline(true);
+                case "underline" -> style = style.withUnderlined(true);
                 case "obfuscated" -> style = style.withObfuscated(true);
                 default -> {
-                    TextColor col = TextColor.parse(format).result().orElse(null);
+                    TextColor col = TextColor.parseColor(format).result().orElse(null);
                     if (col != null) {
                         style = style.withColor(col);
                     } else {
@@ -76,10 +75,10 @@ public record Pronoun(
     }
 
     /**
-     * @return A version of this pronoun formatted as a {@link MutableText}
+     * @return A version of this pronoun formatted as a {@link MutableComponent}
      */
-    public MutableText toText() {
-        return Text.literal(this.pronoun).setStyle(this.style);
+    public MutableComponent toText() {
+        return Component.literal(this.pronoun).setStyle(this.style);
     }
 
     @Override
