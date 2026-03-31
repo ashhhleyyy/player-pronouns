@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 /**
  * A combined set of {@link Pronoun}s
@@ -22,29 +22,29 @@ public record Pronouns(
         String raw,
         Component formatted,
         boolean remote,
-        @Nullable ResourceLocation provider
+        @Nullable Identifier provider
 ) {
     public static final Codec<Pronouns> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("raw").forGetter(Pronouns::raw),
             ComponentSerialization.CODEC.fieldOf("formatted").forGetter(Pronouns::formatted),
             Codec.BOOL.optionalFieldOf("remote", false).forGetter(Pronouns::remote),
-            ResourceLocation.CODEC.optionalFieldOf("provider").forGetter(pronouns -> Optional.ofNullable(pronouns.provider()))
+            Identifier.CODEC.optionalFieldOf("provider").forGetter(pronouns -> Optional.ofNullable(pronouns.provider()))
     ).apply(instance, Pronouns::new));
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType") // lol, lmao
-    private Pronouns(String raw, Component formatted, boolean remote, Optional<ResourceLocation> provider) {
+    private Pronouns(String raw, Component formatted, boolean remote, Optional<Identifier> provider) {
         this(raw, formatted, remote, provider.orElse(null));
     }
 
     private Pronouns(String raw, Component formatted) {
-        this(raw, formatted, false, (ResourceLocation) null);
+        this(raw, formatted, false, (Identifier) null);
     }
 
     public static Pronouns fromString(String pronouns) {
         return Pronouns.fromString(pronouns, false, null);
     }
 
-    public static Pronouns fromString(String pronouns, boolean remote, @Nullable ResourceLocation provider) {
+    public static Pronouns fromString(String pronouns, boolean remote, @Nullable Identifier provider) {
         Component formatted = PronounList.get().getCalculatedPronounStrings().getOrDefault(pronouns, Component.literal(pronouns));
         return new Pronouns(pronouns, formatted, remote, provider);
     }

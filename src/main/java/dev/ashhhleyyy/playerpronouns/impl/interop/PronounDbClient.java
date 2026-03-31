@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 
 public class PronounDbClient implements ExtraPronounProvider {
@@ -96,7 +96,7 @@ public class PronounDbClient implements ExtraPronounProvider {
     }
 
     @Override
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return PlayerPronouns.identifier("pronoundb.org");
     }
 

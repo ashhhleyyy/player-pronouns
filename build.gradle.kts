@@ -1,40 +1,39 @@
 plugins {
-    id("fabric-loom") version "1.11-SNAPSHOT"
+    id("net.fabricmc.fabric-loom") version "1.15-SNAPSHOT"
     id("com.modrinth.minotaur") version "2.+"
     `maven-publish`
 }
 
-version = "2.4.0+1.21.6"
+version = "2.4.0+26.1"
 group = "dev.ashhhleyyy"
 
 repositories {
     // needed for placeholder-api
     maven {
         name = "NucleoidMC"
-        url = uri("https://maven.nucleoid.xyz/releases/")
+        url = uri("https://maven.nucleoid.xyz/")
     }
     // permissions api
     maven {
         name = "Sonatype OSS"
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
     }
 }
 
 dependencies {
     // Minecraft
     minecraft(libs.minecraft)
-    mappings(variantOf(libs.yarn) { classifier("v2") })
 
     // Fabric
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.fabric.api)
+    implementation(libs.fabric.loader)
+    implementation(libs.fabric.api)
 
     // placeholder-api
-    modImplementation(libs.placeholder.api)
+    implementation(libs.placeholder.api)
     include(libs.placeholder.api)
 
     // fabric-api-permissions
-    modImplementation(libs.fabric.permissions)
+    implementation(libs.fabric.permissions)
     include(libs.fabric.permissions)
 }
 
@@ -51,15 +50,15 @@ tasks.processResources {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
 
     withSourcesJar()
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    options.release.set(21)
+    options.release.set(25)
 }
 
 tasks.jar {
@@ -70,7 +69,6 @@ tasks.jar {
 
 modrinth {
     projectId.set("player-pronouns")
-    uploadFile.set(tasks.remapJar.get())
     dependencies {
         required.project("fabric-api")
     }

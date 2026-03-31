@@ -11,15 +11,17 @@ import dev.ashhhleyyy.playerpronouns.impl.interop.PronounDbClient;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.LevelResource;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -43,8 +45,8 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
     private PronounDatabase pronounDatabase;
     private PronounDbClient pronounDbClient;
 
-    public static ResourceLocation identifier(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+    public static Identifier identifier(String path) {
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public static void reloadConfig() {
@@ -110,10 +112,10 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
             PronounsCommand.register(dispatcher);
         });
 
-        Placeholders.register(PlayerPronouns.identifier("pronouns"), (ctx, argument) ->
+        Placeholders.registerServer(PlayerPronouns.identifier("pronouns"), (ctx, argument) ->
                 fromContext(ctx, argument, true));
 
-        Placeholders.register(PlayerPronouns.identifier("raw_pronouns"), (ctx, argument) ->
+        Placeholders.registerServer(PlayerPronouns.identifier("raw_pronouns"), (ctx, argument) ->
                 fromContext(ctx, argument, false));
 
         PronounsApi.initReader(this);
@@ -148,12 +150,12 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
                 }, server);
     }
 
-    private PlaceholderResult fromContext(PlaceholderContext ctx, @Nullable String argument, boolean formatted) {
+    private PlaceholderResult fromContext(ServerPlaceholderContext ctx, @Nullable String argument, boolean formatted) {
         if (!ctx.hasPlayer()) {
             return PlaceholderResult.invalid("missing player");
         }
         String defaultMessage = argument != null ? argument : config.getDefaultPlaceholder();
-        ServerPlayer player = ctx.player();
+        ServerPlayer player = ctx.serverPlayer();
         assert player != null;
         if (pronounDatabase == null) {
             return PlaceholderResult.value(defaultMessage);
