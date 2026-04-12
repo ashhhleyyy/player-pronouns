@@ -11,7 +11,7 @@ repositories {
     // needed for placeholder-api
     maven {
         name = "NucleoidMC"
-        url = uri("https://maven.nucleoid.xyz/")
+        url = uri("https://maven.nucleoid.xyz/releases/")
     }
     // permissions api
     maven {
