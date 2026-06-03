@@ -69,6 +69,7 @@ tasks.jar {
 
 modrinth {
     projectId.set("player-pronouns")
+    uploadFile.set(tasks.remapJar)
     dependencies {
         required.project("fabric-api")
     }
