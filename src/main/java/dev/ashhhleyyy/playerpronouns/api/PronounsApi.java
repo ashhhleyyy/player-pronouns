@@ -1,12 +1,12 @@
 package dev.ashhhleyyy.playerpronouns.api;
 
-import net.minecraft.server.network.ServerPlayerEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Entrypoint to the API, and provides access to a {@link PronounReader} and {@link PronounSetter}
@@ -78,8 +78,8 @@ public final class PronounsApi {
      * Methods in this class may invoke blocking IO operations to save the database to disk.
      */
     public interface PronounSetter {
-        default boolean setPronouns(ServerPlayerEntity player, @Nullable Pronouns pronouns) {
-            return this.setPronouns(player.getUuid(), pronouns);
+        default boolean setPronouns(ServerPlayer player, @Nullable Pronouns pronouns) {
+            return this.setPronouns(player.getUUID(), pronouns);
         }
 
         boolean setPronouns(UUID playerId, @Nullable Pronouns pronouns);
@@ -89,8 +89,8 @@ public final class PronounsApi {
      * Allows obtaining a player's {@link Pronouns}
      */
     public interface PronounReader {
-        default @Nullable Pronouns getPronouns(ServerPlayerEntity player) {
-            return this.getPronouns(player.getUuid());
+        default @Nullable Pronouns getPronouns(ServerPlayer player) {
+            return this.getPronouns(player.getUUID());
         }
 
         @Nullable Pronouns getPronouns(UUID playerId);

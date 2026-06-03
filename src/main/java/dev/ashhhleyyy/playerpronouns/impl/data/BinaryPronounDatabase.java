@@ -3,7 +3,6 @@ package dev.ashhhleyyy.playerpronouns.impl.data;
 import dev.ashhhleyyy.playerpronouns.api.Pronouns;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.text.Text;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -11,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.network.chat.Component;
 
 public class BinaryPronounDatabase {
     private final Path databasePath;
@@ -27,9 +27,9 @@ public class BinaryPronounDatabase {
 
     public static PalettePronounDatabase convert(Path path) throws IOException {
         Object2ObjectMap<UUID, Pronouns> pronouns = new Object2ObjectOpenHashMap<>();
-        Map<String, Text> pronounStrings = PronounList.get().getCalculatedPronounStrings();
+        Map<String, Component> pronounStrings = PronounList.get().getCalculatedPronounStrings();
         for (var entry : BinaryPronounDatabase.load(path).data.entrySet()) {
-            Text formatted = Text.literal(entry.getValue());
+            Component formatted = Component.literal(entry.getValue());
             if (pronounStrings.containsKey(entry.getValue())) {
                 formatted = pronounStrings.get(entry.getValue());
             }

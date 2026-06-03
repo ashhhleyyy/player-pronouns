@@ -2,9 +2,6 @@ package dev.ashhhleyyy.playerpronouns.impl.interop;
 
 import dev.ashhhleyyy.playerpronouns.api.ExtraPronounProvider;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.JsonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +16,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.GsonHelper;
 
 public class PronounDbClient implements ExtraPronounProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(PronounDbClient.class);
@@ -62,7 +62,7 @@ public class PronounDbClient implements ExtraPronounProvider {
                         return Optional.of(resp.body());
                     });
             return completableFuture.thenApply(b -> b.flatMap(body -> {
-                var json = JsonHelper.deserialize(body);
+                var json = GsonHelper.parse(body);
                 String player = playerId.toString();
                 if (json.has(player) && json.getAsJsonObject(player).getAsJsonObject("sets").has("en")) {
                     var pronounList = json.getAsJsonObject(player).getAsJsonObject("sets").getAsJsonArray("en");
@@ -101,8 +101,8 @@ public class PronounDbClient implements ExtraPronounProvider {
     }
 
     @Override
-    public Text getName() {
-        return Text.literal("PronounDB");
+    public Component getName() {
+        return Component.literal("PronounDB");
     }
 
     @Override

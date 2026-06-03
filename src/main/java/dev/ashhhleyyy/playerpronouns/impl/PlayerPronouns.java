@@ -11,16 +11,18 @@ import dev.ashhhleyyy.playerpronouns.impl.interop.PronounDbClient;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.PlaceholderResult;
 import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.WorldSavePath;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.LevelResource;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,7 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
     private PronounDbClient pronounDbClient;
 
     public static Identifier identifier(String path) {
-        return Identifier.of(MOD_ID, path);
+        return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
 
     public static void reloadConfig() {
@@ -61,7 +63,7 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
 
         ServerLifecycleEvents.SERVER_STARTING.register(server -> {
             try {
-                Path playerData = server.getSavePath(WorldSavePath.PLAYERDATA);
+                Path playerData = server.getWorldPath(LevelResource.PLAYER_DATA_DIR);
                 if (!Files.exists(playerData)) {
                     Files.createDirectories(playerData);
                 }
@@ -83,7 +85,7 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
 
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             Iterator<ExtraPronounProvider> providers = PronounsApi.getExtraPronounProviders().iterator();
-            UUID uuid = handler.player.getUuid();
+            UUID uuid = handler.player.getUUID();
             Pronouns currentPronouns = PronounsApi.getReader().getPronouns(uuid);
             if (currentPronouns != null) {
                 if (currentPronouns.remote()) {
@@ -110,10 +112,10 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
             PronounsCommand.register(dispatcher);
         });
 
-        Placeholders.register(PlayerPronouns.identifier("pronouns"), (ctx, argument) ->
+        Placeholders.registerServer(PlayerPronouns.identifier("pronouns"), (ctx, argument) ->
                 fromContext(ctx, argument, true));
 
-        Placeholders.register(PlayerPronouns.identifier("raw_pronouns"), (ctx, argument) ->
+        Placeholders.registerServer(PlayerPronouns.identifier("raw_pronouns"), (ctx, argument) ->
                 fromContext(ctx, argument, false));
 
         PronounsApi.initReader(this);
@@ -135,10 +137,10 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
                         Pronouns newPronouns = Pronouns.fromString(pronouns, true, provider.getId());
                         setPronouns(player, newPronouns);
                         if (!newPronouns.equals(currentPronouns) || !alreadySet) {
-                            ServerPlayerEntity playerEntity = server.getPlayerManager().getPlayer(player);
+                            ServerPlayer playerEntity = server.getPlayerList().getPlayer(player);
                             if (playerEntity != null) {
-                                var message = Text.literal("Set your pronouns to " + pronouns + " (from ").append(provider.getName()).append(")");
-                                playerEntity.sendMessage(message.formatted(Formatting.GREEN));
+                                var message = Component.literal("Set your pronouns to " + pronouns + " (from ").append(provider.getName()).append(")");
+                                playerEntity.sendSystemMessage(message.withStyle(ChatFormatting.GREEN));
                             }
                         }
                     });
@@ -148,17 +150,17 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
                 }, server);
     }
 
-    private PlaceholderResult fromContext(PlaceholderContext ctx, @Nullable String argument, boolean formatted) {
+    private PlaceholderResult fromContext(ServerPlaceholderContext ctx, @Nullable String argument, boolean formatted) {
         if (!ctx.hasPlayer()) {
             return PlaceholderResult.invalid("missing player");
         }
         String defaultMessage = argument != null ? argument : config.getDefaultPlaceholder();
-        ServerPlayerEntity player = ctx.player();
+        ServerPlayer player = ctx.serverPlayer();
         assert player != null;
         if (pronounDatabase == null) {
             return PlaceholderResult.value(defaultMessage);
         }
-        Pronouns pronouns = pronounDatabase.get(player.getUuid());
+        Pronouns pronouns = pronounDatabase.get(player.getUUID());
         if (pronouns == null) {
             return PlaceholderResult.value(defaultMessage);
         }
@@ -182,8 +184,8 @@ public class PlayerPronouns implements ModInitializer, PronounsApi.PronounReader
         return true;
     }
 
-    public @Nullable Pronouns getPronouns(ServerPlayerEntity player) {
-        return getPronouns(player.getUuid());
+    public @Nullable Pronouns getPronouns(ServerPlayer player) {
+        return getPronouns(player.getUUID());
     }
 
     public @Nullable Pronouns getPronouns(UUID playerId) {
