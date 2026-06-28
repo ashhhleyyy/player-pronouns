@@ -3,6 +3,7 @@ package dev.ashhhleyyy.playerpronouns.impl.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.mojang.datafixers.util.Pair;
 import dev.ashhhleyyy.playerpronouns.api.Pronoun;
 import dev.ashhhleyyy.playerpronouns.impl.Config;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
@@ -13,7 +14,6 @@ import java.util.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.Tuple;
 
 public class PronounList {
     private static PronounList INSTANCE;
@@ -38,10 +38,10 @@ public class PronounList {
             return;
         }
 
-        Tuple<List<Pronoun>, List<Pronoun>> defaults = loadDefaults();
+        Pair<List<Pronoun>, List<Pronoun>> defaults = loadDefaults();
         INSTANCE = new PronounList(
-                defaults.getA(),
-                defaults.getB(),
+                defaults.getFirst(),
+                defaults.getSecond(),
                 config.getSingle(),
                 config.getPairs()
         );
@@ -54,7 +54,7 @@ public class PronounList {
         return INSTANCE;
     }
 
-    private static Tuple<List<Pronoun>, List<Pronoun>> loadDefaults() {
+    private static Pair<List<Pronoun>, List<Pronoun>> loadDefaults() {
         try (InputStream is = Objects.requireNonNull(PronounList.class.getResourceAsStream("/default_pronouns.json"));
              InputStreamReader reader = new InputStreamReader(is)) {
             JsonObject ele = JsonParser.parseReader(reader).getAsJsonObject();
@@ -64,10 +64,10 @@ public class PronounList {
             List<Pronoun> pairs = new ArrayList<>();
             jsonSingle.forEach(e -> single.add(new Pronoun(e.getAsString(), Style.EMPTY)));
             jsonPairs.forEach(e -> pairs.add(new Pronoun(e.getAsString(), Style.EMPTY)));
-            return new Tuple<>(single, pairs);
+            return new Pair<>(single, pairs);
         } catch (IOException e) {
             PlayerPronouns.LOGGER.error("Failed to load default pronouns!", e);
-            return new Tuple<>(Collections.emptyList(), Collections.emptyList());
+            return new Pair<>(Collections.emptyList(), Collections.emptyList());
         }
     }
 
