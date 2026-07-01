@@ -1,12 +1,12 @@
 package dev.ashhhleyyy.playerpronouns.api;
 
+import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import net.minecraft.server.level.ServerPlayer;
 
 /**
  * Entrypoint to the API, and provides access to a {@link PronounReader} and {@link PronounSetter}

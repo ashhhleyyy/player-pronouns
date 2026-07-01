@@ -7,13 +7,19 @@ import com.mojang.datafixers.util.Pair;
 import dev.ashhhleyyy.playerpronouns.api.Pronoun;
 import dev.ashhhleyyy.playerpronouns.impl.Config;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class PronounList {
     private static PronounList INSTANCE;

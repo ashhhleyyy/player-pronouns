@@ -3,9 +3,10 @@ package dev.ashhhleyyy.playerpronouns.impl.command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import dev.ashhhleyyy.playerpronouns.impl.data.PronounList;
-import java.util.Locale;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+
+import java.util.Locale;
 
 public class PronounsArgument {
 

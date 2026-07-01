@@ -3,12 +3,12 @@ package dev.ashhhleyyy.playerpronouns.api;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.ashhhleyyy.playerpronouns.impl.data.PronounList;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.resources.Identifier;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 /**
  * A combined set of {@link Pronoun}s

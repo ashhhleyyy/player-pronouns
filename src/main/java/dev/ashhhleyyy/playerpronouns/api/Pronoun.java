@@ -6,13 +6,15 @@ import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
+import org.jspecify.annotations.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * A single pronoun, which consists of the word itself, along with an associated style.
@@ -82,7 +84,7 @@ public record Pronoun(
     }
 
     @Override
-    public String toString() {
+    public @NonNull String toString() {
         return this.pronoun;
     }
 

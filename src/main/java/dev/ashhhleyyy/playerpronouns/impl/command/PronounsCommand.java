@@ -12,6 +12,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionLevel;
+
 import java.util.Map;
 
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
@@ -55,7 +57,7 @@ public class PronounsCommand {
                                 })
                         )
                 ).then(literal("reload-config")
-                        .requires(ctx -> Permissions.check(ctx, "playerpronouns.reload_config", 4))
+                        .requires(ctx -> Permissions.check(ctx, "playerpronouns.reload_config", PermissionLevel.OWNERS))
                         .executes(ctx -> {
                             PlayerPronouns.reloadConfig();
                             ctx.getSource().sendSuccess(() -> Component.literal("Reloaded the config!").withStyle(ChatFormatting.GREEN), true);

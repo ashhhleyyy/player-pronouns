@@ -3,26 +3,25 @@ package dev.ashhhleyyy.playerpronouns.impl.data;
 import dev.ashhhleyyy.playerpronouns.api.Pronouns;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.network.chat.Component;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
-import net.minecraft.network.chat.Component;
 
 public class BinaryPronounDatabase {
-    private final Path databasePath;
     private final Object2ObjectMap<UUID, String> data;
 
-    private BinaryPronounDatabase(Path databasePath, Object2ObjectMap<UUID, String> data) {
-        this.databasePath = databasePath;
+    private BinaryPronounDatabase(Object2ObjectMap<UUID, String> data) {
         this.data = data;
     }
 
-    private BinaryPronounDatabase(Path databasePath) {
-        this(databasePath, new Object2ObjectOpenHashMap<>());
+    private BinaryPronounDatabase() {
+        this(new Object2ObjectOpenHashMap<>());
     }
 
     public static PalettePronounDatabase convert(Path path) throws IOException {
@@ -40,7 +39,7 @@ public class BinaryPronounDatabase {
 
     public static BinaryPronounDatabase load(Path path) throws IOException {
         if (!Files.exists(path)) {
-            return new BinaryPronounDatabase(path);
+            return new BinaryPronounDatabase();
         }
 
         try (InputStream is = Files.newInputStream(path);
@@ -64,35 +63,7 @@ public class BinaryPronounDatabase {
                 }
             }
 
-            return new BinaryPronounDatabase(path, data);
-        }
-    }
-
-    public void put(UUID uuid, @Nullable String pronouns) {
-        if (pronouns == null) {
-            this.data.remove(uuid);
-        } else {
-            this.data.put(uuid, pronouns);
-        }
-    }
-
-    public @Nullable String get(UUID uuid) {
-        return this.data.get(uuid);
-    }
-
-    public synchronized void save() throws IOException {
-        try (OutputStream os = Files.newOutputStream(this.databasePath);
-             DataOutputStream out = new DataOutputStream(os)) {
-
-            out.writeShort(0x4567); // some form of magic, idk
-            out.writeInt(data.size());
-
-            for (var entry : data.entrySet()) {
-                UUID uuid = entry.getKey();
-                out.writeLong(uuid.getMostSignificantBits());
-                out.writeLong(uuid.getLeastSignificantBits());
-                out.writeUTF(entry.getValue());
-            }
+            return new BinaryPronounDatabase(data);
         }
     }
 }

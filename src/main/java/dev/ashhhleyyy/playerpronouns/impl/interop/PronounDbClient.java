@@ -2,6 +2,9 @@ package dev.ashhhleyyy.playerpronouns.impl.interop;
 
 import dev.ashhhleyyy.playerpronouns.api.ExtraPronounProvider;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.GsonHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,9 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.GsonHelper;
 
 public class PronounDbClient implements ExtraPronounProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(PronounDbClient.class);

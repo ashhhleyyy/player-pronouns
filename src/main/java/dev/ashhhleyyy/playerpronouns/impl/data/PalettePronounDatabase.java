@@ -1,6 +1,7 @@
 package dev.ashhhleyyy.playerpronouns.impl.data;
 
 import com.google.gson.JsonParser;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.JsonOps;
 import dev.ashhhleyyy.playerpronouns.api.Pronouns;
 import dev.ashhhleyyy.playerpronouns.impl.PlayerPronouns;
@@ -9,8 +10,12 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.Nullable;
-import com.mojang.datafixers.util.Pair;
-import java.io.*;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
